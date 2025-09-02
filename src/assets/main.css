@@ -14,41 +14,42 @@
 /* 3. THEME & COLOR VARIABLES (Dark/Light Mode Ready) */
 :root {
   /* Light Theme */
-  --c-background: #f4f7fa;
+  --c-background: #f8fafc;
   --c-surface: #ffffff;
-  --c-text-primary: #1a202c;
-  --c-text-secondary: #718096;
-  --c-border: #e2e8f0;
+  --c-text-primary: #0f172a;
+  --c-text-secondary: #64748b;
+  --c-border: #e0e7ff;
 
-  --c-primary: #68829E;
-  --c-primary-light: #e9eef3;
+  --c-primary: #4f46e5;
+  --c-primary-light: #eef2ff;
   --c-primary-text: #ffffff;
 
-  --c-secondary-green: #598234;
-  --c-secondary-green-light: #e6eee0;
+  --c-secondary-green: #22c55e;
+  --c-secondary-green-light: #dcfce7;
 
-  --c-accent-lime: #AEBD38;
-  --c-accent-lime-light: #f3f5dc;
+  --c-accent-lime: #84cc16;
+  --c-accent-lime-light: #ecfccb;
   
-  --c-status-inactive: #a0aec0;
-  --c-status-inactive-light: #edf2f7;
+  --c-status-inactive: #94a3b8;
+  --c-status-inactive-light: #f1f5f9;
 
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --c-background: #1a202c;
-    --c-surface: #2d3748;
-    --c-text-primary: #edf2f7;
-    --c-text-secondary: #a0aec0;
-    --c-border: #4a5568;
+    --c-background: #0f172a;
+    --c-surface: #1e293b;
+    --c-text-primary: #f1f5f9;
+    --c-text-secondary: #94a3b8;
+    --c-border: #475569;
 
-    --c-primary-light: #3a4a61;
-    --c-secondary-green-light: #364d23;
-    --c-accent-lime-light: #5a621c;
-    --c-status-inactive-light: #4a5568;
+    --c-primary-light: #312e81;
+    --c-secondary-green-light: #14532d;
+    --c-accent-lime-light: #4d7c0f;
+    --c-status-inactive-light: #475569;
   }
 }
 
@@ -71,6 +72,7 @@ main {
   flex-grow: 1;
   padding: 2rem;
   overflow-x: hidden;
+  transition: var(--transition);
 }
 
 /* 5. UTILITY & COMPONENT STYLES */
@@ -78,10 +80,11 @@ main {
 /* Card */
 .card {
   background-color: var(--c-surface);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
   border: 1px solid var(--c-border);
+  transition: var(--transition);
 }
 
 /* Buttons */
@@ -89,12 +92,12 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: var(--transition);
   font-size: 0.95rem;
 }
 .btn:disabled {
@@ -107,7 +110,7 @@ main {
   color: var(--c-primary-text);
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: #556c83;
+  background-color: #4338ca;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -123,7 +126,7 @@ main {
 
 /* Forms */
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 .form-group label {
   display: block;
@@ -133,12 +136,12 @@ main {
 }
 .form-control {
   width: 100%;
-  padding: 0.7rem 1rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: var(--c-background);
   color: var(--c-text-primary);
-  transition: border-color 0.2s;
+  transition: var(--transition);
 }
 .form-control:focus {
   outline: none;
@@ -148,12 +151,14 @@ main {
 
 /* Tags / Badges */
 .tag {
-  display: inline-block;
-  padding: 0.2rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
   border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 600;
   line-height: 1.2;
+  transition: var(--transition);
 }
 .tag-active {
   color: var(--c-secondary-green);
@@ -166,4 +171,17 @@ main {
 .tag-account {
     color: var(--c-primary);
     background-color: var(--c-primary-light);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  main {
+    padding: 1rem;
+  }
+  .card {
+    padding: 1rem;
+  }
+  .btn {
+    padding: 0.6rem 1.2rem;
+  }
 }

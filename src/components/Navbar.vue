@@ -1,8 +1,9 @@
 <!-- src/components/Navbar.vue -->
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'sidebar-mobile-open': mobileMenuOpen }">
     <div class="sidebar-header">
       <div class="logo">💊 DrugList</div>
+      <button class="mobile-close" @click="$emit('toggle-mobile-menu')" v-if="mobileMenuOpen">✕</button>
     </div>
     <nav class="sidebar-nav">
       <a href="#" class="nav-item active">
@@ -25,8 +26,8 @@
 </template>
 
 <script setup>
-defineProps({ user: Object })
-defineEmits(['login', 'logout'])
+defineProps({ user: Object, mobileMenuOpen: Boolean })
+defineEmits(['login', 'logout', 'toggle-mobile-menu'])
 </script>
 
 <style scoped>
@@ -37,15 +38,34 @@ defineEmits(['login', 'logout'])
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: -260px;
+  height: 100vh;
+  z-index: 999;
+  transition: var(--transition);
+}
+.sidebar-mobile-open {
+  left: 0;
 }
 .sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--c-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--c-primary);
+}
+.mobile-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--c-text-secondary);
 }
 .sidebar-nav {
   padding: 1rem;
@@ -56,11 +76,11 @@ defineEmits(['login', 'logout'])
   align-items: center;
   gap: 1rem;
   padding: 0.8rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--c-text-secondary);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 .nav-item:hover {
   background-color: var(--c-primary-light);
@@ -113,9 +133,13 @@ defineEmits(['login', 'logout'])
   width: 100%;
 }
 
-@media (max-width: 768px) {
-    .sidebar {
-        display: none; /* Hide sidebar on mobile */
-    }
+@media (min-width: 769px) {
+  .sidebar {
+    position: static;
+    left: 0;
+  }
+  .mobile-close {
+    display: none;
+  }
 }
 </style>

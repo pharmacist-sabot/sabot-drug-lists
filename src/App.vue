@@ -15,6 +15,7 @@ const showCsvModal = ref(false)
 const showDrugFormModal = ref(false)
 const currentDrug = ref(null)
 const toasts = ref([])
+const mobileMenuOpen = ref(false)
 
 const state = reactive({
   user: null,
@@ -141,20 +142,29 @@ function addToast(message, type = 'info') {
   }, 3000)
 }
 
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
 </script>
 
 <template>
   <Navbar 
     :user="state.user"
+    :mobileMenuOpen="mobileMenuOpen"
     @login="handleLogin"
     @logout="handleLogout"
+    @toggle-mobile-menu="toggleMobileMenu"
   />
 
-  <main>
+  <main :class="{ 'main-shift': mobileMenuOpen }">
     <div class="main-header">
-      <div>
-        <h1>บัญชียาโรงพยาบาล</h1>
-        <p class="subtitle">โรงพยาบาลสระโบสถ์</p>
+      <div class="header-left">
+        <button class="mobile-menu-btn" @click="toggleMobileMenu" v-if="!mobileMenuOpen">☰</button>
+        <div>
+          <h1>บัญชียาโรงพยาบาล</h1>
+          <p class="subtitle">โรงพยาบาลสระโบสถ์</p>
+        </div>
       </div>
       <div class="actions" v-if="state.user">
         <button class="btn btn-secondary" @click="showCsvModal = true">นำเข้า CSV</button>
@@ -201,24 +211,35 @@ function addToast(message, type = 'info') {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
-
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--c-text-primary);
+  display: none;
+}
 h1 {
   font-size: 2rem;
   font-weight: 700;
   color: var(--c-text-primary);
 }
-
 .subtitle {
   color: var(--c-text-secondary);
   font-size: 1rem;
 }
-
 .actions {
   display: flex;
   gap: 1rem;
 }
-
 .toast-container {
   position: fixed;
   top: 1rem;
@@ -227,5 +248,26 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+.main-shift {
+  margin-left: 260px;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+  .main-header {
+    justify-content: flex-start;
+  }
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .main-shift {
+    margin-left: 0;
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 </style>

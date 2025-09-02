@@ -24,4 +24,23 @@ function onInput() {
 .search-container {
   margin: 1.5rem 0;
 }
+.search-container input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  background-color: var(--c-background);
+  color: var(--c-text-primary);
+  transition: var(--transition);
+}
+.search-container input:focus {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-light);
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    margin: 1rem 0;
+  }
+}
 </style>

@@ -32,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="drug in drugs" :key="drug.id">
+          <tr v-for="drug in drugs" :key="drug.id" class="table-row">
             <td data-label="ชื่อยา">
               <div class="drug-name-cell">
                 <span class="drug-code">{{ drug.drug_code }}</span>
@@ -97,12 +97,17 @@ const uniqueCategories = computed(() => {
 .search-box {
   display: flex;
   align-items: center;
-  background-color: var(--c-background);
-  border-radius: 6px;
-  padding: 0 0.5rem;
+  background-color: var(--c-surface);
+  border-radius: 8px;
+  padding: 0.25rem 0.75rem;
   border: 1px solid var(--c-border);
   flex-grow: 1;
   max-width: 400px;
+  transition: var(--transition);
+}
+.search-box:focus-within {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-light);
 }
 .search-box svg {
   color: var(--c-text-secondary);
@@ -112,7 +117,7 @@ const uniqueCategories = computed(() => {
   width: 100%;
   border: none;
   background: transparent;
-  padding: 0.7rem 0.5rem;
+  padding: 0.75rem 0.5rem;
   outline: none;
   color: var(--c-text-primary);
 }
@@ -121,11 +126,16 @@ const uniqueCategories = computed(() => {
   gap: 1rem;
 }
 .filters select {
-  padding: 0.7rem 1rem;
+  padding: 0.75rem 1.25rem;
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: var(--c-surface);
   color: var(--c-text-primary);
+  transition: var(--transition);
+}
+.filters select:focus {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-light);
 }
 .table-container {
   overflow-y: auto;
@@ -137,7 +147,7 @@ const uniqueCategories = computed(() => {
 }
 .drug-table th {
   text-align: left;
-  padding: 0.8rem 1rem;
+  padding: 1rem 1.25rem;
   color: var(--c-text-secondary);
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -148,19 +158,25 @@ const uniqueCategories = computed(() => {
   background-color: var(--c-surface);
 }
 .drug-table td {
-  padding: 1rem;
+  padding: 1.25rem 1.25rem;
   border-bottom: 1px solid var(--c-border);
   vertical-align: middle;
 }
 .drug-table tbody tr:last-child td {
   border-bottom: none;
 }
+.table-row {
+  transition: var(--transition);
+}
+.table-row:hover {
+  background-color: var(--c-primary-light);
+}
 .drug-name-cell {
   display: flex;
   flex-direction: column;
 }
 .drug-code {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--c-text-secondary);
 }
 .trade-name {
@@ -177,9 +193,11 @@ const uniqueCategories = computed(() => {
   padding: 0.5rem;
   border-radius: 50%;
   font-size: 1.2rem;
+  transition: var(--transition);
 }
 .action-btn:hover {
   background-color: var(--c-background);
+  transform: scale(1.1);
 }
 .loading-state, .empty-state {
   text-align: center;
@@ -191,6 +209,19 @@ const uniqueCategories = computed(() => {
   color: var(--c-text-primary);
 }
 @media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-box {
+    max-width: none;
+  }
+  .filters {
+    flex-direction: column;
+  }
+  .filters select {
+    width: 100%;
+  }
   .table-container {
     max-height: none;
     overflow-y: visible;
@@ -200,16 +231,17 @@ const uniqueCategories = computed(() => {
   }
   .drug-table tr {
     display: block;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     border: 1px solid var(--c-border);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1rem;
+    box-shadow: var(--shadow-sm);
   }
   .drug-table td {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
     border: none;
   }
   .drug-table td::before {

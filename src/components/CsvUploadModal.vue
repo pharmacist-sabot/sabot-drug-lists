@@ -72,7 +72,7 @@ function processImport() {
 
 <template>
   <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content card">
+    <div class="modal-content card" :class="{ 'modal-animate': show }">
       <h2>นำเข้าข้อมูลยาจากไฟล์ CSV</h2>
       <p>ไฟล์ CSV ต้องมี header ตรงกับที่ระบบกำหนด เช่น รหัสเวชภัณฑ์, ชื่อเวชภัณฑ์, Generic name เป็นต้น</p>
       <div class="form-group">
@@ -80,10 +80,10 @@ function processImport() {
         <input type="file" id="csv-file" @change="handleFileChange" accept=".csv" />
       </div>
       <div class="modal-actions">
-        <button class="secondary" @click="processImport" :disabled="isLoading">
+        <button class="btn btn-secondary" @click="processImport" :disabled="isLoading">
           {{ isLoading ? 'กำลังนำเข้า...' : 'เริ่มนำเข้า' }}
         </button>
-        <button @click="$emit('close')" :disabled="isLoading">ยกเลิก</button>
+        <button class="btn" @click="$emit('close')" :disabled="isLoading">ยกเลิก</button>
       </div>
       <p v-if="message" class="message">{{ message }}</p>
     </div>
@@ -109,7 +109,14 @@ function processImport() {
   max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+  transform: scale(0.95);
+  opacity: 0;
+  transition: var(--transition);
+}
+.modal-animate {
+  transform: scale(1);
+  opacity: 1;
 }
 .modal-actions {
   display: flex;
@@ -118,11 +125,18 @@ function processImport() {
 }
 .message {
   margin-top: 1rem;
-  font-weight: bold;
+  font-weight: 500;
+  text-align: center;
 }
 input[type="file"] {
     background-color: transparent;
     border: none;
     padding: 0;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+  }
 }
 </style>

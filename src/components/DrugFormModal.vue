@@ -1,7 +1,7 @@
 <!-- src/components/DrugFormModal.vue -->
 <template>
   <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content card">
+    <div class="modal-content card" :class="{ 'modal-animate': show }">
       <h2>{{ isEditMode ? 'แก้ไขข้อมูลยา' : 'เพิ่มยาใหม่' }}</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-grid">
@@ -69,14 +69,30 @@ function handleSubmit() {
 }
 .modal-content {
   width: 90%; max-width: 600px;
+  transform: scale(0.95);
+  opacity: 0;
+  transition: var(--transition);
+}
+.modal-animate {
+  transform: scale(1);
+  opacity: 1;
 }
 .modal-actions {
   display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;
 }
 .form-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
 }
 .form-group.full-width {
     grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-content {
+    width: 95%;
+  }
 }
 </style>
