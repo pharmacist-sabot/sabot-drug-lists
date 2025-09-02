@@ -1,0 +1,169 @@
+/* src/assets/main.css */
+
+/* 1. FONT IMPORT */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap');
+
+/* 2. MODERN CSS RESET */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Sarabun', sans-serif;
+}
+
+/* 3. THEME & COLOR VARIABLES (Dark/Light Mode Ready) */
+:root {
+  /* Light Theme */
+  --c-background: #f4f7fa;
+  --c-surface: #ffffff;
+  --c-text-primary: #1a202c;
+  --c-text-secondary: #718096;
+  --c-border: #e2e8f0;
+
+  --c-primary: #68829E;
+  --c-primary-light: #e9eef3;
+  --c-primary-text: #ffffff;
+
+  --c-secondary-green: #598234;
+  --c-secondary-green-light: #e6eee0;
+
+  --c-accent-lime: #AEBD38;
+  --c-accent-lime-light: #f3f5dc;
+  
+  --c-status-inactive: #a0aec0;
+  --c-status-inactive-light: #edf2f7;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-background: #1a202c;
+    --c-surface: #2d3748;
+    --c-text-primary: #edf2f7;
+    --c-text-secondary: #a0aec0;
+    --c-border: #4a5568;
+
+    --c-primary-light: #3a4a61;
+    --c-secondary-green-light: #364d23;
+    --c-accent-lime-light: #5a621c;
+    --c-status-inactive-light: #4a5568;
+  }
+}
+
+/* 4. BASE STYLES */
+body {
+  background-color: var(--c-background);
+  color: var(--c-text-primary);
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  display: flex; /* Key for sidebar layout */
+  min-height: 100vh;
+}
+
+main {
+  flex-grow: 1;
+  padding: 2rem;
+  overflow-x: hidden;
+}
+
+/* 5. UTILITY & COMPONENT STYLES */
+
+/* Card */
+.card {
+  background-color: var(--c-surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+  border: 1px solid var(--c-border);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--c-primary);
+  color: var(--c-primary-text);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #556c83;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--c-surface);
+  color: var(--c-primary);
+  border: 1px solid var(--c-primary);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--c-primary-light);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--c-text-secondary);
+}
+.form-control {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background-color: var(--c-background);
+  color: var(--c-text-primary);
+  transition: border-color 0.2s;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-light);
+}
+
+/* Tags / Badges */
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.tag-active {
+  color: var(--c-secondary-green);
+  background-color: var(--c-secondary-green-light);
+}
+.tag-inactive {
+  color: var(--c-status-inactive);
+  background-color: var(--c-status-inactive-light);
+}
+.tag-account {
+    color: var(--c-primary);
+    background-color: var(--c-primary-light);
+}
