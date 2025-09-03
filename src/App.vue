@@ -17,11 +17,9 @@ const currentDrug = ref(null)
 const toasts = ref([])
 const mobileMenuOpen = ref(false)
 
-// State ใหม่สำหรับเก็บ Category ทั้งหมดจากฐานข้อมูล
 const allCategories = ref([])
 
-// Pagination State
-const pageSize = ref(20) // Items per page
+const pageSize = ref(20)
 const currentPage = ref(1)
 const totalCount = ref(0)
 
@@ -38,17 +36,20 @@ const state = reactive({
 
 let searchTimeout
 
-// ฟังก์ชันใหม่สำหรับดึง Category ที่ไม่ซ้ำกันทั้งหมด
-async function fetchAllCategories() {
-  // เรียกใช้ฟังก์ชัน 'get_unique_categories' ที่เราสร้างไว้ใน Supabase
-  const { data, error } = await supabase.rpc('get_unique_categories')
+async function fetchAllCategories(status = 'active') {
+  const { data, error } = await supabase.rpc('get_unique_categories', { 
+    status_filter: status 
+  })
 
   if (error) {
     console.error('Error fetching categories:', error)
     addToast('ไม่สามารถดึงข้อมูลหมวดหมู่ได้', 'error')
   } else {
-    // แปลงผลลัพธ์จาก [{ category: 'A' }, ...] เป็น ['A', ...]
     allCategories.value = data.map(item => item.category)
+
+    if (!allCategories.value.includes(state.filterCategory) && state.filterCategory !== 'all') {
+      state.filterCategory = 'all';
+    }
   }
 }
 
@@ -62,8 +63,7 @@ onMounted(async () => {
     fetchDrugs() 
   })
 
-  // เรียกฟังก์ชันเพื่อดึงข้อมูลทั้งสองส่วนเมื่อแอปเริ่มทำงาน
-  await fetchAllCategories()
+  await fetchAllCategories(state.filterStatus)
   await fetchDrugs()
 })
 
@@ -106,11 +106,20 @@ async function fetchDrugs() {
   loading.value = false
 }
 
-watch([() => state.searchTerm, () => state.filterCategory, () => state.filterStatus], () => {
+watch([() => state.searchTerm, () => state.filterCategory], () => {
   clearTimeout(searchTimeout)
   currentPage.value = 1
   searchTimeout = setTimeout(fetchDrugs, 300)
 })
+
+
+watch(() => state.filterStatus, (newStatus) => {
+  fetchAllCategories(newStatus)
+  clearTimeout(searchTimeout)
+  currentPage.value = 1
+  searchTimeout = setTimeout(fetchDrugs, 300)
+})
+
 
 function goToPage(page) {
   if (page < 1 || page > totalPages.value) return
@@ -141,7 +150,7 @@ async function saveDrug(drugData) {
     showDrugFormModal.value = false
     addToast('บันทึกข้อมูลยาสำเร็จ', 'success')
     await fetchDrugs()
-    await fetchAllCategories() // อัปเดต Category เผื่อมีการเพิ่มใหม่
+    await fetchAllCategories(state.filterStatus)
   }
   loading.value = false
 }
@@ -158,6 +167,7 @@ async function toggleDrugStatus(drug) {
   } else {
     addToast(`เปลี่ยนสถานะยา "${drug.trade_name}" สำเร็จ`, 'success')
     await fetchDrugs()
+    await fetchAllCategories(state.filterStatus)
   }
   loading.value = false
 }
@@ -200,7 +210,7 @@ function toggleMobileMenu() {
     @toggle-mobile-menu="toggleMobileMenu"
   />
 
-  <main :class="{ 'main-shift': mobileMenuOpen }">
+  <main>
     <div class="main-header">
       <div class="header-left">
         <button class="mobile-menu-btn" @click="toggleMobileMenu" v-if="!mobileMenuOpen">☰</button>
@@ -238,7 +248,7 @@ function toggleMobileMenu() {
   <CsvUploadModal 
     :show="showCsvModal" 
     @close="showCsvModal = false"
-    @import-success="() => { fetchDrugs(); fetchAllCategories(); addToast('นำเข้าข้อมูลสำเร็จ!', 'success'); }"
+    @import-success="() => { fetchDrugs(); fetchAllCategories(state.filterStatus); addToast('นำเข้าข้อมูลสำเร็จ!', 'success'); }"
   />
 
   <DrugFormModal
