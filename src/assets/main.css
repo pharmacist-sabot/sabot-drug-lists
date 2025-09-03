@@ -73,6 +73,8 @@ main {
   padding: 2rem;
   overflow-x: hidden;
   transition: var(--transition);
+  display: flex; 
+  flex-direction: column; 
 }
 
 /* 5. UTILITY & COMPONENT STYLES */

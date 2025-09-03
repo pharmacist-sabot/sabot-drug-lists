@@ -41,10 +41,11 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
   position: fixed;
   top: 0;
   left: -260px;
-  height: 100vh;
+  height: 100vh; 
   z-index: 999;
   transition: var(--transition);
 }
+
 .sidebar-mobile-open {
   left: 0;
 }
@@ -69,7 +70,7 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
 }
 .sidebar-nav {
   padding: 1rem;
-  flex-grow: 1;
+  flex-grow: 1; 
 }
 .nav-item {
   display: flex;
@@ -137,6 +138,7 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
   .sidebar {
     position: static;
     left: 0;
+    height: auto; 
   }
   .mobile-close {
     display: none;

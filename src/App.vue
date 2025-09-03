@@ -1,6 +1,6 @@
 <!-- src/App.vue -->
 <script setup>
-import { ref, onMounted, watch, reactive } from 'vue'
+import { ref, onMounted, watch, reactive, computed } from 'vue'
 import { supabase } from './supabaseClient'
 
 import Navbar from './components/Navbar.vue'
@@ -16,6 +16,15 @@ const showDrugFormModal = ref(false)
 const currentDrug = ref(null)
 const toasts = ref([])
 const mobileMenuOpen = ref(false)
+
+// Pagination State
+const pageSize = ref(20) // Items per page
+const currentPage = ref(1)
+const totalCount = ref(0)
+
+const totalPages = computed(() => {
+  return Math.ceil(totalCount.value / pageSize.value)
+})
 
 const state = reactive({
   user: null,
@@ -41,7 +50,17 @@ onMounted(async () => {
 
 async function fetchDrugs() {
   loading.value = true
-  let query = supabase.from('drugs').select('*').order('drug_code', { ascending: true })
+  
+  // Calculate range for pagination
+  const from = (currentPage.value - 1) * pageSize.value
+  const to = from + pageSize.value - 1
+
+  let query = supabase
+    .from('drugs')
+    // IMPORTANT: Request total count along with the data
+    .select('*', { count: 'exact' }) 
+    .order('drug_code', { ascending: true })
+    .range(from, to) // Apply pagination
 
   // Apply status filter
   if (state.filterStatus === 'active') {
@@ -60,21 +79,30 @@ async function fetchDrugs() {
     query = query.or(`trade_name.ilike.${searchTermFormatted},generic_name.ilike.${searchTermFormatted},drug_code.ilike.${searchTermFormatted}`)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
   
   if (error) {
     console.error('Error fetching drugs:', error)
     addToast('ไม่สามารถดึงข้อมูลยาได้', 'error')
   } else {
     drugs.value = data
+    totalCount.value = count || 0 // Update total count
   }
   loading.value = false
 }
 
+// Watch for filter changes to reset page and re-fetch
 watch([() => state.searchTerm, () => state.filterCategory, () => state.filterStatus], () => {
   clearTimeout(searchTimeout)
+  currentPage.value = 1 // Reset to first page on new search/filter
   searchTimeout = setTimeout(fetchDrugs, 300)
 })
+
+function goToPage(page) {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  fetchDrugs()
+}
 
 function openAddDrugModal() {
   currentDrug.value = null
@@ -98,7 +126,7 @@ async function saveDrug(drugData) {
   } else {
     showDrugFormModal.value = false
     addToast('บันทึกข้อมูลยาสำเร็จ', 'success')
-    await fetchDrugs()
+    await fetchDrugs() // Refetch current page
   }
   loading.value = false
 }
@@ -114,7 +142,7 @@ async function toggleDrugStatus(drug) {
     addToast('เกิดข้อผิดพลาดในการอัปเดตสถานะ', 'error')
   } else {
     addToast(`เปลี่ยนสถานะยา "${drug.trade_name}" สำเร็จ`, 'success')
-    await fetchDrugs()
+    await fetchDrugs() // Refetch current page
   }
   loading.value = false
 }
@@ -182,8 +210,12 @@ function toggleMobileMenu() {
       v-model:searchTerm="state.searchTerm"
       v-model:filterCategory="state.filterCategory"
       v-model:filterStatus="state.filterStatus"
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      :total-count="totalCount"
       @edit="openEditDrugModal"
       @toggle-status="toggleDrugStatus" 
+      @change-page="goToPage"
     />
   </main>
 

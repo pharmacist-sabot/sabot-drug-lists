@@ -58,6 +58,25 @@
         <p>ไม่พบรายการยาที่ตรงกับเงื่อนไขการค้นหาของคุณ</p>
       </div>
     </div>
+
+    <div v-if="!loading && totalPages > 1" class="pagination-controls">
+      <span>หน้าที่ {{ currentPage }} / {{ totalPages }} (ทั้งหมด {{ totalCount }} รายการ)</span>
+      <div class="pagination-buttons">
+        <button 
+          class="btn btn-secondary" 
+          @click="$emit('change-page', currentPage - 1)" 
+          :disabled="currentPage === 1">
+          &lt; ก่อนหน้า
+        </button>
+        <button 
+          class="btn btn-secondary" 
+          @click="$emit('change-page', currentPage + 1)" 
+          :disabled="currentPage >= totalPages">
+          ถัดไป &gt;
+        </button>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -70,12 +89,16 @@ const props = defineProps({
   isAdmin: Boolean,
   searchTerm: String,
   filterCategory: String,
-  filterStatus: String
+  filterStatus: String,
+  currentPage: Number,
+  totalPages: Number,
+  totalCount: Number,
 })
 
-defineEmits(['edit', 'toggle-status', 'update:searchTerm', 'update:filterCategory', 'update:filterStatus'])
+defineEmits(['edit', 'toggle-status', 'update:searchTerm', 'update:filterCategory', 'update:filterStatus', 'change-page'])
 
 const uniqueCategories = computed(() => {
+
   if (!props.drugs || props.drugs.length === 0) {
     return []
   }
@@ -139,7 +162,7 @@ const uniqueCategories = computed(() => {
 }
 .table-container {
   overflow-y: auto;
-  max-height: 70vh;
+  max-height: calc(70vh - 60px); 
 }
 .drug-table {
   width: 100%;
@@ -208,6 +231,24 @@ const uniqueCategories = computed(() => {
   font-size: 1.2rem;
   color: var(--c-text-primary);
 }
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--c-border);
+  color: var(--c-text-secondary);
+}
+.pagination-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+.pagination-controls .btn {
+  padding: 0.5rem 1rem;
+}
+
 @media (max-width: 768px) {
   .controls {
     flex-direction: column;
@@ -256,6 +297,11 @@ const uniqueCategories = computed(() => {
   }
   .drug-table .actions-cell::before {
     display: none;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 </style>
