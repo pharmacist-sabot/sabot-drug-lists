@@ -17,6 +17,9 @@ const currentDrug = ref(null)
 const toasts = ref([])
 const mobileMenuOpen = ref(false)
 
+// State ใหม่สำหรับเก็บ Category ทั้งหมดจากฐานข้อมูล
+const allCategories = ref([])
+
 // Pagination State
 const pageSize = ref(20) // Items per page
 const currentPage = ref(1)
@@ -35,6 +38,20 @@ const state = reactive({
 
 let searchTimeout
 
+// ฟังก์ชันใหม่สำหรับดึง Category ที่ไม่ซ้ำกันทั้งหมด
+async function fetchAllCategories() {
+  // เรียกใช้ฟังก์ชัน 'get_unique_categories' ที่เราสร้างไว้ใน Supabase
+  const { data, error } = await supabase.rpc('get_unique_categories')
+
+  if (error) {
+    console.error('Error fetching categories:', error)
+    addToast('ไม่สามารถดึงข้อมูลหมวดหมู่ได้', 'error')
+  } else {
+    // แปลงผลลัพธ์จาก [{ category: 'A' }, ...] เป็น ['A', ...]
+    allCategories.value = data.map(item => item.category)
+  }
+}
+
 onMounted(async () => {
   const { data: { session } } = await supabase.auth.getSession()
   state.user = session?.user ?? null
@@ -45,24 +62,23 @@ onMounted(async () => {
     fetchDrugs() 
   })
 
-  fetchDrugs()
+  // เรียกฟังก์ชันเพื่อดึงข้อมูลทั้งสองส่วนเมื่อแอปเริ่มทำงาน
+  await fetchAllCategories()
+  await fetchDrugs()
 })
 
 async function fetchDrugs() {
   loading.value = true
   
-  // Calculate range for pagination
   const from = (currentPage.value - 1) * pageSize.value
   const to = from + pageSize.value - 1
 
   let query = supabase
     .from('drugs')
-    // IMPORTANT: Request total count along with the data
     .select('*', { count: 'exact' }) 
     .order('drug_code', { ascending: true })
-    .range(from, to) // Apply pagination
+    .range(from, to)
 
-  // Apply status filter
   if (state.filterStatus === 'active') {
     query = query.eq('is_active', true)
   } else if (state.filterStatus === 'inactive') {
@@ -73,7 +89,6 @@ async function fetchDrugs() {
     query = query.eq('category', state.filterCategory)
   }
 
-  // Apply search
   if (state.searchTerm) {
     const searchTermFormatted = `%${state.searchTerm.trim()}%`
     query = query.or(`trade_name.ilike.${searchTermFormatted},generic_name.ilike.${searchTermFormatted},drug_code.ilike.${searchTermFormatted}`)
@@ -86,15 +101,14 @@ async function fetchDrugs() {
     addToast('ไม่สามารถดึงข้อมูลยาได้', 'error')
   } else {
     drugs.value = data
-    totalCount.value = count || 0 // Update total count
+    totalCount.value = count || 0
   }
   loading.value = false
 }
 
-// Watch for filter changes to reset page and re-fetch
 watch([() => state.searchTerm, () => state.filterCategory, () => state.filterStatus], () => {
   clearTimeout(searchTimeout)
-  currentPage.value = 1 // Reset to first page on new search/filter
+  currentPage.value = 1
   searchTimeout = setTimeout(fetchDrugs, 300)
 })
 
@@ -126,7 +140,8 @@ async function saveDrug(drugData) {
   } else {
     showDrugFormModal.value = false
     addToast('บันทึกข้อมูลยาสำเร็จ', 'success')
-    await fetchDrugs() // Refetch current page
+    await fetchDrugs()
+    await fetchAllCategories() // อัปเดต Category เผื่อมีการเพิ่มใหม่
   }
   loading.value = false
 }
@@ -142,7 +157,7 @@ async function toggleDrugStatus(drug) {
     addToast('เกิดข้อผิดพลาดในการอัปเดตสถานะ', 'error')
   } else {
     addToast(`เปลี่ยนสถานะยา "${drug.trade_name}" สำเร็จ`, 'success')
-    await fetchDrugs() // Refetch current page
+    await fetchDrugs()
   }
   loading.value = false
 }
@@ -210,6 +225,7 @@ function toggleMobileMenu() {
       v-model:searchTerm="state.searchTerm"
       v-model:filterCategory="state.filterCategory"
       v-model:filterStatus="state.filterStatus"
+      :available-categories="allCategories"
       :current-page="currentPage"
       :total-pages="totalPages"
       :total-count="totalCount"
@@ -222,7 +238,7 @@ function toggleMobileMenu() {
   <CsvUploadModal 
     :show="showCsvModal" 
     @close="showCsvModal = false"
-    @import-success="() => { fetchDrugs(); addToast('นำเข้าข้อมูลสำเร็จ!', 'success'); }"
+    @import-success="() => { fetchDrugs(); fetchAllCategories(); addToast('นำเข้าข้อมูลสำเร็จ!', 'success'); }"
   />
 
   <DrugFormModal

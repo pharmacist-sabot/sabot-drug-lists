@@ -9,7 +9,8 @@
       <div class="filters">
         <select :value="filterCategory" @change="$emit('update:filterCategory', $event.target.value)">
           <option value="all">ทุกหมวดหมู่ (Category)</option>
-          <option v-for="cat in uniqueCategories" :key="cat" :value="cat">
+          <!-- เปลี่ยนมาใช้ prop ใหม่ที่ได้รับมา -->
+          <option v-for="cat in availableCategories" :key="cat" :value="cat">
             {{ cat }}
           </option>
         </select>
@@ -81,9 +82,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue' 
+// import { computed } from 'vue' // ไม่ต้องการ computed แล้ว
 
-const props = defineProps({
+defineProps({
   drugs: Array,
   loading: Boolean,
   isAdmin: Boolean,
@@ -93,18 +94,11 @@ const props = defineProps({
   currentPage: Number,
   totalPages: Number,
   totalCount: Number,
+  // รับ prop ใหม่เข้ามา
+  availableCategories: Array,
 })
 
 defineEmits(['edit', 'toggle-status', 'update:searchTerm', 'update:filterCategory', 'update:filterStatus', 'change-page'])
-
-const uniqueCategories = computed(() => {
-
-  if (!props.drugs || props.drugs.length === 0) {
-    return []
-  }
-  const categories = props.drugs.map(drug => drug.category).filter(Boolean)
-  return [...new Set(categories)].sort()
-})
 
 </script>
 
