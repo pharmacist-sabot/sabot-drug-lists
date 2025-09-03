@@ -1,46 +1,47 @@
 <!-- src/components/SearchBar.vue -->
 <script setup>
-import { ref } from 'vue'
-const emit = defineEmits(['search'])
-const searchTerm = ref('')
-
-function onInput() {
-  emit('search', searchTerm.value)
-}
+defineProps(['modelValue'])
+defineEmits(['update:modelValue'])
 </script>
 
 <template>
-  <div class="search-container">
-    <input
-      type="search"
-      v-model="searchTerm"
-      @input="onInput"
-      placeholder="ค้นหาด้วยรหัส, ชื่อยา หรือชื่อสามัญ..."
+  <div class="search-box">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input 
+      type="search" 
+      :value="modelValue" 
+      @input="$emit('update:modelValue', $event.target.value)" 
+      placeholder="ค้นหา..."
     />
   </div>
 </template>
 
 <style scoped>
-.search-container {
-  margin: 1.5rem 0;
-}
-.search-container input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--c-border);
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--c-surface);
   border-radius: 8px;
-  background-color: var(--c-background);
-  color: var(--c-text-primary);
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--c-border);
+  flex-grow: 1;
+  max-width: 400px;
   transition: var(--transition);
 }
-.search-container input:focus {
+.search-box:focus-within {
   border-color: var(--c-primary);
   box-shadow: 0 0 0 3px var(--c-primary-light);
 }
-
-@media (max-width: 768px) {
-  .search-container {
-    margin: 1rem 0;
-  }
+.search-box svg {
+  color: var(--c-text-secondary);
+  margin-right: 0.5rem;
+}
+.search-box input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 0.5rem;
+  outline: none;
+  color: var(--c-text-primary);
 }
 </style>

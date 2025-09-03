@@ -73,8 +73,9 @@ main {
   padding: 2rem;
   overflow-x: hidden;
   transition: var(--transition);
-  display: flex; 
-  flex-direction: column; 
+  display: flex;
+  flex-direction: column;
+  position: relative; 
 }
 
 /* 5. UTILITY & COMPONENT STYLES */
@@ -179,6 +180,7 @@ main {
 @media (max-width: 768px) {
   main {
     padding: 1rem;
+    padding-top: 5rem;
   }
   .card {
     padding: 1rem;

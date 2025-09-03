@@ -6,11 +6,17 @@
       <button class="mobile-close" @click="$emit('toggle-mobile-menu')" v-if="mobileMenuOpen">✕</button>
     </div>
     <nav class="sidebar-nav">
-      <a href="#" class="nav-item active">
+      <!-- ใช้ router-link แทน a href -->
+      <router-link to="/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
         <span>บัญชียา</span>
-      </a>
-      <!-- Add more nav items here in the future -->
+      </router-link>
+
+      <!-- ลิงก์ใหม่สำหรับหน้าที่เราสร้างขึ้น -->
+      <router-link to="/decommissioned" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="9"></line><line x1="15" y1="15" x2="9" y2="9"></line></svg>
+        <span>ยาที่นำออกจากบัญชี</span>
+      </router-link>
     </nav>
     <div class="sidebar-footer">
       <div v-if="user" class="user-profile">
@@ -26,6 +32,8 @@
 </template>
 
 <script setup>
+import { RouterLink } from 'vue-router'
+
 defineProps({ user: Object, mobileMenuOpen: Boolean })
 defineEmits(['login', 'logout', 'toggle-mobile-menu'])
 </script>
@@ -41,14 +49,11 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
   position: fixed;
   top: 0;
   left: -260px;
-  height: 100vh; 
+  height: 100vh;
   z-index: 999;
   transition: var(--transition);
 }
-
-.sidebar-mobile-open {
-  left: 0;
-}
+.sidebar-mobile-open { left: 0; }
 .sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--c-border);
@@ -56,22 +61,9 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
   justify-content: space-between;
   align-items: center;
 }
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--c-primary);
-}
-.mobile-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--c-text-secondary);
-}
-.sidebar-nav {
-  padding: 1rem;
-  flex-grow: 1; 
-}
+.logo { font-size: 1.5rem; font-weight: 700; color: var(--c-primary); }
+.mobile-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--c-text-secondary); }
+.sidebar-nav { padding: 1rem; flex-grow: 1; }
 .nav-item {
   display: flex;
   align-items: center;
@@ -87,61 +79,22 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
   background-color: var(--c-primary-light);
   color: var(--c-text-primary);
 }
-.nav-item.active {
+/* Vue Router จะเพิ่ม class นี้ให้ลิงก์ที่ active อยู่โดยอัตโนมัติ */
+.nav-item.router-link-exact-active {
   background-color: var(--c-primary-light);
   color: var(--c-primary);
   font-weight: 700;
 }
-.sidebar-footer {
-  padding: 1.5rem;
-  border-top: 1px solid var(--c-border);
-}
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.user-info {
-  line-height: 1.2;
-}
-.user-name {
-  font-weight: 700;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
-}
-.logout-btn {
-  background: none;
-  border: none;
-  color: var(--c-text-secondary);
-  cursor: pointer;
-  padding: 0;
-  font-size: 0.8rem;
-}
-.logout-btn:hover {
-  color: var(--c-primary);
-  text-decoration: underline;
-}
-.login-btn {
-  width: 100%;
-}
-
+.sidebar-footer { padding: 1.5rem; border-top: 1px solid var(--c-border); }
+.user-profile { display: flex; align-items: center; gap: 1rem; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.user-info { line-height: 1.2; }
+.user-name { font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+.logout-btn { background: none; border: none; color: var(--c-text-secondary); cursor: pointer; padding: 0; font-size: 0.8rem; }
+.logout-btn:hover { color: var(--c-primary); text-decoration: underline; }
+.login-btn { width: 100%; }
 @media (min-width: 769px) {
-  .sidebar {
-    position: static;
-    left: 0;
-    height: auto; 
-  }
-  .mobile-close {
-    display: none;
-  }
+  .sidebar { position: static; left: 0; height: auto; }
+  .mobile-close { display: none; }
 }
 </style>
