@@ -1,6 +1,6 @@
 <!-- src/views/HomeView.vue -->
 <script setup>
-import { ref, onMounted, watch, reactive, computed } from 'vue'
+import { ref, onMounted, watch, reactive, computed, inject } from 'vue'
 import { supabase } from '../supabaseClient'
 import DrugTable from '../components/DrugTable.vue'
 import CsvUploadModal from '../components/CsvUploadModal.vue'
@@ -13,9 +13,9 @@ const showCsvModal = ref(false)
 const showDrugFormModal = ref(false)
 const showDecommissionModal = ref(false)
 const currentDrug = ref(null)
-const toasts = ref([])
 const allCategories = ref([])
 const user = ref(null)
+const addToast = inject('addToast')
 
 const pageSize = ref(20)
 const currentPage = ref(1)
@@ -126,11 +126,7 @@ async function decommissionDrug({ drug, remarks }) {
   showDecommissionModal.value = false
   loading.value = false
 }
-function addToast(message, type = 'info') {
 
-  console.log(`Toast: ${type} - ${message}`);
-
-}
 </script>
 
 <template>

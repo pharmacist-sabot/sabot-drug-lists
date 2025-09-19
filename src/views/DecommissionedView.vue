@@ -1,18 +1,18 @@
 <!-- src/views/DecommissionedView.vue -->
 <script setup>
-import { ref, onMounted, watch, reactive, computed } from 'vue'
+import { ref, onMounted, watch, reactive, computed, inject } from 'vue'
 import { supabase } from '../supabaseClient'
 import DrugTable from '../components/DrugTable.vue'
 
 const drugs = ref([])
 const loading = ref(true)
 const user = ref(null)
-
 const filters = reactive({ searchTerm: '' })
 const currentPage = ref(1)
 const pageSize = ref(20)
 const totalCount = ref(0)
 const totalPages = computed(() => Math.ceil(totalCount.value / pageSize.value))
+const addToast = inject('addToast')
 
 async function fetchDecommissionedDrugs() {
   loading.value = true
@@ -22,9 +22,9 @@ async function fetchDecommissionedDrugs() {
   let query = supabase
     .from('drugs')
     .select('*', { count: 'exact' })
-    .eq('is_active', false) // ดึงเฉพาะยาที่ Inactive
-    .not('remarks', 'is', null) // และต้องมีเหตุผล (ไม่นับยาที่เพิ่งสร้างแต่ยังไม่ active)
-    .order('decommissioned_at', { ascending: false }) // เรียงจากล่าสุดไปเก่าสุด
+    .eq('is_active', false) 
+    .not('remarks', 'is', null) 
+    .order('decommissioned_at', { ascending: false }) 
     .range(from, to)
 
   if (filters.searchTerm) {
@@ -42,7 +42,6 @@ async function fetchDecommissionedDrugs() {
   loading.value = false
 }
 
-// ฟังก์ชันสำหรับเปิดใช้งานยาอีกครั้ง (Re-commission)
 async function recommissionDrug(drug) {
     if (!confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`)) return
 
@@ -58,7 +57,9 @@ async function recommissionDrug(drug) {
     
     if (error) {
         console.error('Error recommissioning drug:', error)
+        addToast(`เกิดข้อผิดพลาดในการนำยาเข้าบัญชี: ${error.message}`, 'error')
     } else {
+        addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, 'success')
         await fetchDecommissionedDrugs()
     }
     loading.value = false

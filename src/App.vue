@@ -1,6 +1,6 @@
 <!-- src/App.vue -->
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import { supabase } from './supabaseClient'
 import Navbar from './components/Navbar.vue'
 import Toast from './components/Toast.vue'
@@ -35,6 +35,8 @@ function addToast(message, type = 'info') {
     toasts.value = toasts.value.filter(t => t.id !== id)
   }, 3000)
 }
+
+provide('addToast', addToast)
 
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value

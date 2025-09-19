@@ -1,6 +1,6 @@
 <!-- src/components/CsvUploadModal.vue -->
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import Papa from 'papaparse'
 import { supabase } from '../supabaseClient'
 
@@ -9,27 +9,26 @@ const emit = defineEmits(['close', 'import-success'])
 
 const file = ref(null)
 const isLoading = ref(false)
-const message = ref('')
+const addToast = inject('addToast', console.log)
 
 function handleFileChange(event) {
   file.value = event.target.files[0]
-  message.value = ''
 }
 
 function processImport() {
   if (!file.value) {
-    message.value = 'กรุณาเลือกไฟล์ CSV'
+    addToast('กรุณาเลือกไฟล์ CSV', 'error')
     return
   }
 
   isLoading.value = true
-  message.value = 'กำลังประมวลผลไฟล์...'
+  addToast('กำลังประมวลผลไฟล์...', 'info')
 
   Papa.parse(file.value, {
     header: true,
     skipEmptyLines: true,
     complete: async (results) => {
-      message.value = `พบข้อมูล ${results.data.length} รายการ กำลังนำเข้า...`
+      addToast(`พบข้อมูล ${results.data.length} รายการ กำลังนำเข้า...`, 'info')
       
       const drugsToInsert = results.data.map(row => ({
         drug_code: row['รหัสเวชภัณฑ์'] || null,
@@ -38,33 +37,32 @@ function processImport() {
         account: row['บัญชี'] || null,
         price_opd: parseFloat(row['ราคา (OPD)']) || 0,
         category: row['Category'] || null,
-        is_active: true, // Default to active
-      })).filter(drug => drug.drug_code); // Ensure drug_code exists
+        is_active: true, 
+      })).filter(drug => drug.drug_code); 
 
       if (drugsToInsert.length === 0) {
-        message.value = 'ไม่พบข้อมูลที่ถูกต้องในไฟล์ CSV'
+        addToast('ไม่พบข้อมูลที่ถูกต้องในไฟล์ CSV', 'error')
         isLoading.value = false
         return;
       }
       
-      // Upsert: update if drug_code exists, otherwise insert
       const { error } = await supabase.from('drugs').upsert(drugsToInsert, {
         onConflict: 'drug_code'
       })
 
       isLoading.value = false
       if (error) {
-        message.value = `เกิดข้อผิดพลาด: ${error.message}`
+        addToast(`เกิดข้อผิดพลาด: ${error.message}`, 'error')
         console.error(error)
       } else {
-        message.value = `นำเข้าข้อมูล ${drugsToInsert.length} รายการสำเร็จ!`
+        addToast(`นำเข้าข้อมูล ${drugsToInsert.length} รายการสำเร็จ!`, 'success')
         emit('import-success')
         setTimeout(() => emit('close'), 2000)
       }
     },
     error: (err) => {
         isLoading.value = false;
-        message.value = `เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`
+        addToast(`เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`, 'error')
     }
   })
 }
@@ -85,13 +83,11 @@ function processImport() {
         </button>
         <button class="btn" @click="$emit('close')" :disabled="isLoading">ยกเลิก</button>
       </div>
-      <p v-if="message" class="message">{{ message }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Scoped styles for modals */
 .modal-overlay {
   position: fixed;
   top: 0;
