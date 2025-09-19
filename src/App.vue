@@ -41,6 +41,11 @@ provide('addToast', addToast)
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
+
+provide('user', user)
+provide('handleLogin', handleLogin)
+provide('handleLogout', handleLogout)
+
 </script>
 
 <template>

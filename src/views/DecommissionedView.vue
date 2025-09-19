@@ -6,13 +6,13 @@ import DrugTable from '../components/DrugTable.vue'
 
 const drugs = ref([])
 const loading = ref(true)
-const user = ref(null)
 const filters = reactive({ searchTerm: '' })
 const currentPage = ref(1)
 const pageSize = ref(20)
 const totalCount = ref(0)
 const totalPages = computed(() => Math.ceil(totalCount.value / pageSize.value))
 const addToast = inject('addToast')
+const user = inject('user')
 
 async function fetchDecommissionedDrugs() {
   loading.value = true
@@ -66,8 +66,6 @@ async function recommissionDrug(drug) {
 }
 
 onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession()
-  user.value = session?.user ?? null
   await fetchDecommissionedDrugs()
 })
 

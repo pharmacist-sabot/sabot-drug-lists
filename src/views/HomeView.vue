@@ -14,8 +14,8 @@ const showDrugFormModal = ref(false)
 const showDecommissionModal = ref(false)
 const currentDrug = ref(null)
 const allCategories = ref([])
-const user = ref(null)
 const addToast = inject('addToast')
+const user = inject('user')
 
 const pageSize = ref(20)
 const currentPage = ref(1)
@@ -71,9 +71,6 @@ async function fetchDrugs() {
   loading.value = false
 }
 onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession()
-  user.value = session?.user ?? null
-
   await fetchAllCategories()
   await fetchDrugs()
 })
