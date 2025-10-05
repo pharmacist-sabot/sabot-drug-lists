@@ -12,7 +12,7 @@ const pageSize = ref(20)
 const totalCount = ref(0)
 const totalPages = computed(() => Math.ceil(totalCount.value / pageSize.value))
 const addToast = inject('addToast')
-const user = inject('user')
+const isAdmin = inject('isAdmin') // เปลี่ยนจาก user เป็น isAdmin
 
 async function fetchDecommissionedDrugs() {
   loading.value = true
@@ -31,7 +31,7 @@ async function fetchDecommissionedDrugs() {
     const searchTermFormatted = `%${filters.searchTerm.trim()}%`
     query = query.or(`trade_name.ilike.${searchTermFormatted},generic_name.ilike.${searchTermFormatted},drug_code.ilike.${searchTermFormatted},remarks.ilike.${searchTermFormatted}`)
   }
-  
+
   const { data, error, count } = await query
   if (error) {
     console.error(error)
@@ -44,8 +44,8 @@ async function fetchDecommissionedDrugs() {
 
 async function recommissionDrug(drug) {
     if (!confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`)) return
-
     loading.value = true
+
     const { error } = await supabase
         .from('drugs')
         .update({
@@ -54,7 +54,7 @@ async function recommissionDrug(drug) {
             decommissioned_at: null 
         })
         .eq('id', drug.id)
-    
+
     if (error) {
         console.error('Error recommissioning drug:', error)
         addToast(`เกิดข้อผิดพลาดในการนำยาเข้าบัญชี: ${error.message}`, 'error')
@@ -85,11 +85,10 @@ function goToPage(page) {
     <h1>ยาที่นำออกจากบัญชี</h1>
     <p class="subtitle">ประวัติยาที่ถูกปิดการใช้งานพร้อมเหตุผล</p>
   </div>
-
   <DrugTable
     :drugs="drugs"
     :loading="loading"
-    :is-admin="!!user"
+    :is-admin="isAdmin" 
     :is-decommissioned-view="true"
     v-model:searchTerm="filters.searchTerm"
     :current-page="currentPage"

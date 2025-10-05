@@ -6,13 +6,11 @@
       <button class="mobile-close" @click="$emit('toggle-mobile-menu')" v-if="mobileMenuOpen">✕</button>
     </div>
     <nav class="sidebar-nav">
-      <!-- ใช้ router-link แทน a href -->
+
       <router-link to="/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
         <span>บัญชียา</span>
       </router-link>
-
-      <!-- ลิงก์ใหม่สำหรับหน้าที่เราสร้างขึ้น -->
       <router-link to="/decommissioned" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="9"></line><line x1="15" y1="15" x2="9" y2="9"></line></svg>
         <span>ยาที่นำออกจากบัญชี</span>
@@ -79,7 +77,6 @@ defineEmits(['login', 'logout', 'toggle-mobile-menu'])
   background-color: var(--c-primary-light);
   color: var(--c-text-primary);
 }
-/* Vue Router จะเพิ่ม class นี้ให้ลิงก์ที่ active อยู่โดยอัตโนมัติ */
 .nav-item.router-link-exact-active {
   background-color: var(--c-primary-light);
   color: var(--c-primary);

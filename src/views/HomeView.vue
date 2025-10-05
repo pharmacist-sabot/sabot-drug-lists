@@ -15,7 +15,7 @@ const showDecommissionModal = ref(false)
 const currentDrug = ref(null)
 const allCategories = ref([])
 const addToast = inject('addToast')
-const user = inject('user')
+const isAdmin = inject('isAdmin') // เปลี่ยนจาก user เป็น isAdmin
 
 const pageSize = ref(20)
 const currentPage = ref(1)
@@ -25,10 +25,10 @@ const totalPages = computed(() => Math.ceil(totalCount.value / pageSize.value))
 const filters = reactive({
   searchTerm: '',
   filterCategory: 'all',
-  filterStatus: 'active',
 })
 
 let searchTimeout
+
 async function fetchAllCategories() {
   const { data, error } = await supabase.rpc('get_unique_categories', { status_filter: 'active' })
   if (error) {
@@ -40,11 +40,11 @@ async function fetchAllCategories() {
     }
   }
 }
+
 async function fetchDrugs() {
   loading.value = true
   const from = (currentPage.value - 1) * pageSize.value
   const to = from + pageSize.value - 1
-
   let query = supabase
     .from('drugs')
     .select('*', { count: 'exact' })
@@ -55,7 +55,6 @@ async function fetchDrugs() {
   if (filters.filterCategory !== 'all') {
     query = query.eq('category', filters.filterCategory)
   }
-
   if (filters.searchTerm) {
     const searchTermFormatted = `%${filters.searchTerm.trim()}%`
     query = query.or(`trade_name.ilike.${searchTermFormatted},generic_name.ilike.${searchTermFormatted},drug_code.ilike.${searchTermFormatted}`)
@@ -70,28 +69,34 @@ async function fetchDrugs() {
   }
   loading.value = false
 }
+
 onMounted(async () => {
   await fetchAllCategories()
   await fetchDrugs()
 })
+
 watch([() => filters.searchTerm, () => filters.filterCategory], () => {
   clearTimeout(searchTimeout)
   currentPage.value = 1
   searchTimeout = setTimeout(fetchDrugs, 300)
 })
+
 function goToPage(page) {
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
   fetchDrugs()
 }
+
 function openAddDrugModal() { currentDrug.value = null; showDrugFormModal.value = true; }
 function openEditDrugModal(drug) { currentDrug.value = { ...drug }; showDrugFormModal.value = true; }
 function openDecommissionModal(drug) { currentDrug.value = drug; showDecommissionModal.value = true; }
+
 async function saveDrug(drugData) {
   loading.value = true
   const { error } = drugData.id
     ? await supabase.from('drugs').update(drugData).eq('id', drugData.id)
     : await supabase.from('drugs').insert([drugData])
+
   if (error) {
     addToast(`เกิดข้อผิดพลาด: ${error.message}`, 'error')
   } else {
@@ -102,6 +107,7 @@ async function saveDrug(drugData) {
   }
   loading.value = false
 }
+
 async function decommissionDrug({ drug, remarks }) {
   loading.value = true
   const { error } = await supabase
@@ -112,7 +118,7 @@ async function decommissionDrug({ drug, remarks }) {
       decommissioned_at: new Date().toISOString()
     })
     .eq('id', drug.id)
-  
+
   if (error) {
     addToast('เกิดข้อผิดพลาดในการนำยาออก', 'error')
   } else {
@@ -123,7 +129,6 @@ async function decommissionDrug({ drug, remarks }) {
   showDecommissionModal.value = false
   loading.value = false
 }
-
 </script>
 
 <template>
@@ -134,7 +139,7 @@ async function decommissionDrug({ drug, remarks }) {
         <p class="subtitle">โรงพยาบาลสระโบสถ์</p>
       </div>
     </div>
-    <div class="actions" v-if="user">
+    <div class="actions" v-if="isAdmin"> <!-- เปลี่ยนจาก v-if="user" เป็น v-if="isAdmin" -->
       <button class="btn btn-secondary" @click="showCsvModal = true">นำเข้า CSV</button>
       <button class="btn btn-primary" @click="openAddDrugModal">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -142,11 +147,10 @@ async function decommissionDrug({ drug, remarks }) {
       </button>
     </div>
   </div>
-
   <DrugTable 
     :drugs="drugs"
     :loading="loading"
-    :is-admin="!!user"
+    :is-admin="isAdmin" 
     :is-decommissioned-view="false"
     v-model:searchTerm="filters.searchTerm"
     v-model:filterCategory="filters.filterCategory"
@@ -158,20 +162,17 @@ async function decommissionDrug({ drug, remarks }) {
     @trigger-decommission="openDecommissionModal" 
     @change-page="goToPage"
   />
-
   <CsvUploadModal 
     :show="showCsvModal" 
     @close="showCsvModal = false"
     @import-success="() => { fetchDrugs(); fetchAllCategories(); addToast('นำเข้าข้อมูลสำเร็จ!', 'success'); }"
   />
-
   <DrugFormModal
     :show="showDrugFormModal"
     :drug="currentDrug"
     @close="showDrugFormModal = false"
     @save="saveDrug"
   />
-
   <DecommissionModal
     v-if="currentDrug"
     :show="showDecommissionModal"

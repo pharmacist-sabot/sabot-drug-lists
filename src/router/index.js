@@ -12,7 +12,7 @@ const routes = [
   {
     path: '/decommissioned',
     name: 'Decommissioned',
-    // Lazy load the component for better performance
+
     component: () => import('../views/DecommissionedView.vue'),
     meta: { title: 'ยาที่นำออกจากบัญชี' }
   }
@@ -23,7 +23,6 @@ const router = createRouter({
   routes
 })
 
-// Set the document title for each route
 router.beforeEach((to, from, next) => {
   document.title = `${to.meta.title} | DrugList` || 'DrugList'
   next()

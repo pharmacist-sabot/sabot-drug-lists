@@ -71,7 +71,10 @@ function handleSubmit() {
 .modal-overlay {
   position: fixed; inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  display: flex; justify-content: center; align-items: center; z-index: 1000;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  z-index: 1000;
   padding: 1rem; 
 }
 
@@ -114,7 +117,8 @@ function handleSubmit() {
 }
 
 .form-grid {
-    display: grid; grid-template-columns: 1fr 1fr; 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
     gap: 0 1.25rem; 
 }
 
@@ -123,7 +127,9 @@ function handleSubmit() {
 }
 
 .modal-actions {
-  display: flex; justify-content: flex-end; gap: 1rem; 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 1rem; 
   margin-top: 1.5rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--c-border);

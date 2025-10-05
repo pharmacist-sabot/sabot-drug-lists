@@ -52,17 +52,20 @@ function handleConfirm() {
     alert('กรุณากรอกเหตุผลในการนำออก')
     return
   }
-  // ส่งข้อมูลยาและเหตุผลกลับไปให้ Parent Component
   emit('confirm', { drug: props.drug, remarks: remarks.value })
-  remarks.value = '' // Reset aTfter submit
+  remarks.value = '' 
 }
 </script>
 
 <style scoped>
 .modal-overlay {
-  position: fixed; inset: 0;
+  position: fixed; 
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  display: flex; justify-content: center; align-items: center; z-index: 1000;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  z-index: 1000;
   padding: 1rem;
 }
 .modal-content {
@@ -98,7 +101,6 @@ function handleConfirm() {
   padding-top: 1rem;
   border-top: 1px solid var(--c-border);
 }
-/* Custom button style for danger action */
 .btn-danger {
   background-color: #dc2626;
   color: white;

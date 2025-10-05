@@ -8,7 +8,7 @@
 <script setup>
 defineProps({
   message: String,
-  type: String, // 'success', 'error', 'info'
+  type: String,
 })
 </script>
 

@@ -6,7 +6,7 @@
         :model-value="searchTerm" 
         @update:model-value="$emit('update:searchTerm', $event)" 
       />
-      <!-- ซ่อน filter ถ้าอยู่ในหน้ายาที่นำออก -->
+
       <div class="filters" v-if="!isDecommissionedView">
         <select :value="filterCategory" @change="$emit('update:filterCategory', $event.target.value)">
           <option value="all">ทุกหมวดหมู่ (Category)</option>
@@ -14,7 +14,7 @@
             {{ cat }}
           </option>
         </select>
-        <!-- ซ่อน filter status เพราะหน้านี้แสดงเฉพาะ Active -->
+
       </div>
     </div>
 
@@ -24,7 +24,6 @@
         <thead>
           <tr>
             <th>รหัส / ชื่อยา</th>
-            <!-- แสดงคอลัมน์ต่างกันตามหน้า -->
             <th v-if="isDecommissionedView">เหตุผลที่นำออก / วันที่</th>
             <th v-else>สถานะ</th>
             <th v-if="isAdmin"></th>
@@ -39,7 +38,6 @@
               </div>
             </td>
 
-            <!-- แสดงข้อมูลต่างกันตามหน้า -->
             <td v-if="isDecommissionedView" data-label="เหตุผล">
                 <div class="remarks-cell">
                     <span class="remarks-text">{{ drug.remarks }}</span>
@@ -53,7 +51,6 @@
             </td>
 
             <td v-if="isAdmin" class="actions-cell">
-              <!-- แสดงปุ่มต่างกันตามหน้า -->
               <template v-if="!isDecommissionedView">
                 <button @click="$emit('edit', drug)" class="action-btn" title="แก้ไข" aria-label="แก้ไขข้อมูลยา">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="m13.83 3.92 2.25 2.25-9.28 9.28-2.93.38.38-2.93L13.83 3.92ZM16.41 2.2a2.33 2.33 0 0 0-3.3 0L3.7 11.62a1 1 0 0 0-.26.47l-1 5a1 1 0 0 0 1.18 1.18l5-1a1 1 0 0 0 .47-.26L17.8 8.16a2.33 2.33 0 0 0 0-3.3Z"/></svg>
@@ -94,7 +91,7 @@ const props = defineProps({
   drugs: Array,
   loading: Boolean,
   isAdmin: Boolean,
-  isDecommissionedView: { type: Boolean, default: false }, // Prop ใหม่
+  isDecommissionedView: { type: Boolean, default: false },
   searchTerm: String,
   filterCategory: String,
   availableCategories: Array,
@@ -105,14 +102,13 @@ const props = defineProps({
 
 const emit = defineEmits([
     'edit', 
-    'trigger-decommission', // Event ใหม่สำหรับเปิด modal
-    'recommission', // Event ใหม่สำหรับนำยากลับ
+    'trigger-decommission', 
+    'recommission', 
     'update:searchTerm', 
     'update:filterCategory', 
     'change-page'
 ])
 
-// ฟังก์ชันสำหรับจัดรูปแบบวันที่
 function formatDate(dateString) {
     if (!dateString) return ''
     const date = new Date(dateString)

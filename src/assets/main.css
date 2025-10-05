@@ -1,9 +1,7 @@
 /* src/assets/main.css */
-
-/* 1. FONT IMPORT */
+/* FONT IMPORT */
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap');
 
-/* 2. MODERN CSS RESET */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -11,9 +9,7 @@
   font-family: 'Sarabun', sans-serif;
 }
 
-/* 3. THEME & COLOR VARIABLES (Dark/Light Mode Ready) */
 :root {
-  /* Light Theme */
   --c-background: #f8fafc;
   --c-surface: #ffffff;
   --c-text-primary: #0f172a;
@@ -53,7 +49,7 @@
   }
 }
 
-/* 4. BASE STYLES */
+/* BASE STYLES */
 body {
   background-color: var(--c-background);
   color: var(--c-text-primary);
@@ -64,7 +60,7 @@ body {
 }
 
 #app {
-  display: flex; /* Key for sidebar layout */
+  display: flex; 
   min-height: 100vh;
 }
 
@@ -77,8 +73,6 @@ main {
   flex-direction: column;
   position: relative; 
 }
-
-/* 5. UTILITY & COMPONENT STYLES */
 
 /* Card */
 .card {
