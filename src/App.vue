@@ -10,7 +10,7 @@ const loginEmail = ref('')
 const loginPassword = ref('')
 const loginError = ref('')
 const user = ref(null)
-const isAdmin = ref(false) // เพิ่ม state ใหม่
+const isAdmin = ref(false)
 const mobileMenuOpen = ref(false)
 const toasts = ref([])
 
@@ -34,7 +34,7 @@ onMounted(async () => {
 
 async function checkAdminRole(userId) {
   const { data, error } = await supabase
-    .from('profiles_drugcupsabot') // ตรวจสอบว่าตารางนี้มีคอลัมน์ `role` จริง
+    .from('profiles_drugcupsabot')
     .select('role')
     .eq('id', userId)
     .single()
@@ -62,12 +62,17 @@ async function handleLogin() {
     showLoginModal.value = false
     loginEmail.value = ''
     loginPassword.value = ''
+    addToast('เข้าสู่ระบบสำเร็จ', 'success')
   }
 }
 
 async function handleLogout() {
   const { error } = await supabase.auth.signOut()
-  if (error) addToast(`Logout Error: ${error.message}`, 'error')
+  if (error) {
+    addToast(`Logout Error: ${error.message}`, 'error')
+  } else {
+    addToast('ออกจากระบบแล้ว', 'info')
+  }
 }
 
 function addToast(message, type = 'info') {
@@ -80,7 +85,7 @@ function addToast(message, type = 'info') {
 
 provide('addToast', addToast)
 provide('user', user)
-provide('isAdmin', isAdmin) // ให้ component อื่นใช้ตรวจสอบ
+provide('isAdmin', isAdmin)
 provide('handleLogin', handleLogin)
 provide('handleLogout', handleLogout)
 
@@ -90,120 +95,221 @@ function toggleMobileMenu() {
 </script>
 
 <template>
-  <Navbar 
-    :user="user"
-    :isAdmin="isAdmin"
-    :mobileMenuOpen="mobileMenuOpen"
-    @login="showLoginModal = true"
-    @logout="handleLogout"
-    @toggle-mobile-menu="toggleMobileMenu"
-  />
-  <main :class="{ 'main-shift': mobileMenuOpen }">
-    <button class="mobile-menu-btn" @click="toggleMobileMenu" v-if="!mobileMenuOpen">☰</button>
-    <router-view />
-  </main>
-  <div class="toast-container">
-    <Toast v-for="toast in toasts" :key="toast.id" :message="toast.message" :type="toast.type" />
-  </div>
+  <div class="app">
+    <Navbar 
+      :user="user"
+      :isAdmin="isAdmin"
+      :mobileMenuOpen="mobileMenuOpen"
+      @login="showLoginModal = true"
+      @logout="handleLogout"
+      @toggle-mobile-menu="toggleMobileMenu"
+    />
+    
+    <main>
+      <router-view />
+    </main>
 
-  <!-- Modal ล็อกอิน -->
-  <div v-if="showLoginModal" class="modal-overlay" @click.self="showLoginModal = false">
-    <div class="modal-content card" :class="{ 'modal-animate': showLoginModal }">
-      <h2>เข้าสู่ระบบ</h2>
-      <form @submit.prevent="handleLogin" class="modal-form">
-        <div class="form-group">
-          <label for="email">อีเมล</label>
-          <input id="email" v-model="loginEmail" type="email" class="form-control" required />
-        </div>
-        <div class="form-group">
-          <label for="password">รหัสผ่าน</label>
-          <input id="password" v-model="loginPassword" type="password" class="form-control" required />
-        </div>
-        <div v-if="loginError" class="message" style="color: red;">{{ loginError }}</div>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary">เข้าสู่ระบบ</button>
-          <button type="button" class="btn" @click="showLoginModal = false">ยกเลิก</button>
-        </div>
-      </form>
+    <div class="toast-container">
+      <Toast v-for="toast in toasts" :key="toast.id" :message="toast.message" :type="toast.type" />
     </div>
+
+    <!-- Login Modal -->
+    <Transition name="modal">
+      <div v-if="showLoginModal" class="modal-overlay" @click.self="showLoginModal = false">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h2>ยินดีต้อนรับกลับ</h2>
+            <p class="modal-subtitle">เข้าสู่ระบบเพื่อจัดการระบบบัญชียา</p>
+          </div>
+          
+          <form @submit.prevent="handleLogin" class="modal-body">
+            <div class="form-group">
+              <label for="email">อีเมล</label>
+              <input 
+                id="email" 
+                v-model="loginEmail" 
+                type="email" 
+                class="form-control" 
+                placeholder="your.email@example.com" 
+                required 
+                autocomplete="email"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label for="password">รหัสผ่าน</label>
+              <input 
+                id="password" 
+                v-model="loginPassword" 
+                type="password" 
+                class="form-control" 
+                placeholder="••••••••" 
+                required 
+                autocomplete="current-password"
+              />
+            </div>
+            
+            <div v-if="loginError" class="alert alert-error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>{{ loginError }}</span>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-ghost" @click="showLoginModal = false">ยกเลิก</button>
+              <button type="submit" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                เข้าสู่ระบบ
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <style scoped>
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .toast-container {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  max-width: 400px;
 }
-.mobile-menu-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--c-text-primary);
-  display: none;
-  position: absolute;
-  top: 2rem;
-  left: 1rem; 
-  z-index: 998;
-}
+
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 1rem;
 }
-.modal-content {
-  width: 90%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  transform: scale(0.95);
-  opacity: 0;
-  transition: var(--transition);
+
+.modal-dialog {
+  background-color: var(--c-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 440px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-.modal-animate {
-  transform: scale(1);
-  opacity: 1;
+
+.modal-header {
+  padding: 2rem 2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--c-border);
 }
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+
+.modal-header h2 {
+  font-size: 1.75rem;
+  color: var(--c-text-primary);
+  margin-bottom: 0.5rem;
 }
-.modal-actions {
+
+.modal-subtitle {
+  color: var(--c-text-secondary);
+  font-size: 0.875rem;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--c-border);
+  margin-top: 1.5rem;
 }
-.message {
-  margin-top: 1rem;
-  font-weight: 500;
-  text-align: center;
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
 }
+
+.alert-error {
+  background-color: var(--c-danger-light);
+  color: var(--c-danger);
+  border: 1px solid var(--c-danger);
+}
+
+.alert svg {
+  flex-shrink: 0;
+}
+
+/* Modal Transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .modal-dialog,
+.modal-leave-active .modal-dialog {
+  transition: transform 0.2s ease;
+}
+
+.modal-enter-from .modal-dialog,
+.modal-leave-to .modal-dialog {
+  transform: scale(0.95);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .mobile-menu-btn {
-    display: block;
+  .toast-container {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
   }
-  .main-shift {
-    margin-left: 0;
-    opacity: 0.5;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+
+  .modal-dialog {
+    max-width: 100%;
   }
-  .modal-content {
-    width: 95%;
+
+  .modal-header,
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1.5rem;
   }
 }
 </style>
