@@ -1,106 +1,96 @@
 <!-- src/views/DecommissionedView.vue -->
 <script setup>
-import { ref, onMounted, watch, reactive, computed, inject } from 'vue'
-import { supabase } from '../supabaseClient'
-import DrugTable from '../components/DrugTable.vue'
+import { onMounted, watch, inject } from "vue";
+import { useDrugs } from "../composables/useDrugs";
+import { useAuth } from "../composables/useAuth";
+import DrugTable from "../components/DrugTable.vue";
 
-const drugs = ref([])
-const loading = ref(true)
-const filters = reactive({ searchTerm: '' })
-const currentPage = ref(1)
-const pageSize = ref(20)
-const totalCount = ref(0)
-const totalPages = computed(() => Math.ceil(totalCount.value / pageSize.value))
-const addToast = inject('addToast')
-const isAdmin = inject('isAdmin') // เปลี่ยนจาก user เป็น isAdmin
+// -- Core Logic via Composables --
+// Initialize for 'decommissioned' drugs
+const {
+    drugs,
+    loading,
+    filters,
+    currentPage,
+    totalPages,
+    totalCount,
+    fetchDrugs,
+    recommissionDrug: apiRecommissionDrug,
+    changePage,
+} = useDrugs({ status: "decommissioned" });
 
-async function fetchDecommissionedDrugs() {
-  loading.value = true
-  const from = (currentPage.value - 1) * pageSize.value
-  const to = from + pageSize.value - 1
+const { isAdmin } = useAuth();
+const addToast = inject("addToast");
+let searchTimeout;
 
-  let query = supabase
-    .from('drugs')
-    .select('*', { count: 'exact' })
-    .eq('is_active', false) 
-    .not('remarks', 'is', null) 
-    .order('decommissioned_at', { ascending: false }) 
-    .range(from, to)
+onMounted(() => {
+    fetchDrugs();
+});
 
-  if (filters.searchTerm) {
-    const searchTermFormatted = `%${filters.searchTerm.trim()}%`
-    query = query.or(`trade_name.ilike.${searchTermFormatted},generic_name.ilike.${searchTermFormatted},drug_code.ilike.${searchTermFormatted},remarks.ilike.${searchTermFormatted}`)
-  }
+// Debounce search
+watch(
+    () => filters.searchTerm,
+    () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentPage.value = 1;
+            fetchDrugs();
+        }, 300);
+    },
+);
 
-  const { data, error, count } = await query
-  if (error) {
-    console.error(error)
-  } else {
-    drugs.value = data
-    totalCount.value = count || 0
-  }
-  loading.value = false
-}
+async function handleRecommission(drug) {
+    if (
+        !confirm(
+            `คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`,
+        )
+    )
+        return;
 
-async function recommissionDrug(drug) {
-    if (!confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`)) return
-    loading.value = true
+    const result = await apiRecommissionDrug(drug);
 
-    const { error } = await supabase
-        .from('drugs')
-        .update({
-            is_active: true,
-            remarks: null, 
-            decommissioned_at: null 
-        })
-        .eq('id', drug.id)
-
-    if (error) {
-        console.error('Error recommissioning drug:', error)
-        addToast(`เกิดข้อผิดพลาดในการนำยาเข้าบัญชี: ${error.message}`, 'error')
+    if (result.success) {
+        addToast(
+            `นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`,
+            "success",
+        );
     } else {
-        addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, 'success')
-        await fetchDecommissionedDrugs()
+        addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
     }
-    loading.value = false
-}
-
-onMounted(async () => {
-  await fetchDecommissionedDrugs()
-})
-
-watch(() => filters.searchTerm, () => {
-  currentPage.value = 1
-  setTimeout(fetchDecommissionedDrugs, 300)
-})
-
-function goToPage(page) {
-  currentPage.value = page
-  fetchDecommissionedDrugs()
 }
 </script>
 
 <template>
-  <div class="main-header">
-    <h1>ยาที่นำออกจากบัญชี</h1>
-    <p class="subtitle">ประวัติยาที่ถูกปิดการใช้งานพร้อมเหตุผล</p>
-  </div>
-  <DrugTable
-    :drugs="drugs"
-    :loading="loading"
-    :is-admin="isAdmin" 
-    :is-decommissioned-view="true"
-    v-model:searchTerm="filters.searchTerm"
-    :current-page="currentPage"
-    :total-pages="totalPages"
-    :total-count="totalCount"
-    @recommission="recommissionDrug"
-    @change-page="goToPage"
-  />
+    <div class="main-header">
+        <h1>ยาที่นำออกจากบัญชี</h1>
+        <p class="subtitle">ประวัติยาที่ถูกปิดการใช้งานพร้อมเหตุผล</p>
+    </div>
+
+    <DrugTable
+        :drugs="drugs"
+        :loading="loading"
+        :is-admin="isAdmin"
+        :is-decommissioned-view="true"
+        v-model:searchTerm="filters.searchTerm"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :total-count="totalCount"
+        @recommission="handleRecommission"
+        @change-page="changePage"
+    />
 </template>
 
 <style scoped>
-.main-header { margin-bottom: 2rem; }
-h1 { font-size: 2rem; font-weight: 700; color: var(--c-text-primary); }
-.subtitle { color: var(--c-text-secondary); font-size: 1rem; }
+.main-header {
+    margin-bottom: 2rem;
+}
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--c-text-primary);
+}
+.subtitle {
+    color: var(--c-text-secondary);
+    font-size: 1rem;
+}
 </style>
