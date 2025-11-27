@@ -118,7 +118,7 @@ async function onCsvSuccess() {
     <div class="main-header">
         <div class="header-left">
             <div>
-                <h1>บัญชียาโรงพยาบาล</h1>
+                <h1>รายการบัญชียาโรงพยาบาล</h1>
                 <p class="subtitle">โรงพยาบาลสระโบสถ์</p>
             </div>
         </div>
@@ -129,17 +129,8 @@ async function onCsvSuccess() {
                 นำเข้า CSV
             </button>
             <button class="btn btn-primary" @click="openAddDrugModal">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
@@ -148,42 +139,19 @@ async function onCsvSuccess() {
         </div>
     </div>
 
-    <DrugTable
-        :drugs="drugs"
-        :loading="loading"
-        :is-admin="isAdmin"
-        :is-decommissioned-view="false"
-        v-model:searchTerm="filters.searchTerm"
-        v-model:filterCategory="filters.category"
-        :available-categories="allCategories"
-        :current-page="currentPage"
-        :total-pages="totalPages"
-        :total-count="totalCount"
-        @edit="openEditDrugModal"
-        @trigger-decommission="openDecommissionModal"
-        @change-page="changePage"
-    />
+    <DrugTable :drugs="drugs" :loading="loading" :is-admin="isAdmin" :is-decommissioned-view="false"
+        v-model:searchTerm="filters.searchTerm" v-model:filterCategory="filters.category"
+        :available-categories="allCategories" :current-page="currentPage" :total-pages="totalPages"
+        :total-count="totalCount" @edit="openEditDrugModal" @trigger-decommission="openDecommissionModal"
+        @change-page="changePage" />
 
-    <CsvUploadModal
-        :show="showCsvModal"
-        @close="showCsvModal = false"
-        @import-success="onCsvSuccess"
-    />
+    <CsvUploadModal :show="showCsvModal" @close="showCsvModal = false" @import-success="onCsvSuccess" />
 
-    <DrugFormModal
-        :show="showDrugFormModal"
-        :drug="currentDrug"
-        @close="showDrugFormModal = false"
-        @save="handleSaveDrug"
-    />
+    <DrugFormModal :show="showDrugFormModal" :drug="currentDrug" @close="showDrugFormModal = false"
+        @save="handleSaveDrug" />
 
-    <DecommissionModal
-        v-if="currentDrug"
-        :show="showDecommissionModal"
-        :drug="currentDrug"
-        @close="showDecommissionModal = false"
-        @confirm="handleDecommission"
-    />
+    <DecommissionModal v-if="currentDrug" :show="showDecommissionModal" :drug="currentDrug"
+        @close="showDecommissionModal = false" @confirm="handleDecommission" />
 </template>
 
 <style scoped>
@@ -195,30 +163,30 @@ async function onCsvSuccess() {
     flex-wrap: wrap;
     gap: 1rem;
 }
+
 .header-left {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
-h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--c-text-primary);
-}
+
 .subtitle {
     color: var(--c-text-secondary);
     font-size: 1rem;
 }
+
 .actions {
     display: flex;
     gap: 1rem;
 }
+
 @media (max-width: 768px) {
     .main-header {
         justify-content: flex-start;
-        margin-top: -1rem;
-        margin-left: 2.5rem;
+        margin-top: 0.5rem;
+        margin-left: 1.5rem;
     }
+
     .actions {
         width: 100%;
         justify-content: space-between;
