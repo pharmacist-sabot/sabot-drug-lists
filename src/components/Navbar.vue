@@ -1,401 +1,455 @@
 <!-- src/components/Navbar.vue -->
 <template>
-  <header class="navbar" :class="{ 'mobile-menu-active': mobileMenuOpen }">
-    <div class="navbar-container">
-      <!-- Logo -->
-      <div class="navbar-brand">
-        <div class="logo-wrapper">
-          <span class="logo-icon">💊</span>
-        </div>
-        <div class="logo-content">
-          <span class="logo-text">DrugList</span>
-          <span class="logo-subtitle">โรงพยาบาลสระโบสถ์</span>
-        </div>
-      </div>
+    <header class="navbar">
+        <div class="navbar-container">
+            <!-- Logo -->
+            <router-link to="/" class="navbar-brand">
+                <div class="logo-wrapper">
+                    <span class="logo-icon">💊</span>
+                </div>
+                <div class="logo-content">
+                    <span class="logo-text">DrugList</span>
+                    <span class="logo-subtitle">โรงพยาบาลสระโบสถ์</span>
+                </div>
+            </router-link>
 
-      <!-- Desktop Navigation -->
-      <nav class="navbar-nav desktop-nav">
-        <router-link to="/" class="nav-link">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-          </svg>
-          <span>บัญชียา</span>
-        </router-link>
-        <router-link to="/decommissioned" class="nav-link">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="9" y1="15" x2="15" y2="9"></line>
-            <line x1="15" y1="15" x2="9" y2="9"></line>
-          </svg>
-          <span>ยาที่นำออกจากบัญชี</span>
-        </router-link>
-      </nav>
+            <!-- Desktop Navigation -->
+            <nav class="desktop-nav">
+                <router-link to="/" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span>บัญชียา</span>
+                </router-link>
+                <router-link to="/decommissioned" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="9" y1="15" x2="15" y2="9"></line>
+                        <line x1="15" y1="15" x2="9" y2="9"></line>
+                    </svg>
+                    <span>ยาที่นำออกจากบัญชี</span>
+                </router-link>
+            </nav>
 
-      <!-- User Section -->
-      <div class="navbar-actions">
-        <div v-if="user" class="user-menu">
-          <div class="user-avatar-wrapper">
-            <img 
-              :src="user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email) + '&background=3b82f6&color=fff'" 
-              alt="User Avatar" 
-              class="user-avatar"
-            />
-          </div>
-          <div class="user-info">
-            <span class="user-name">{{ user.user_metadata?.full_name || user.email }}</span>
-            <button class="logout-link" @click="$emit('logout')">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              ออกจากระบบ
+            <!-- Desktop Actions -->
+            <div class="desktop-actions">
+                <div v-if="user" class="user-menu-desktop">
+                    <div class="user-info">
+                        <span class="user-name">{{ user.user_metadata?.full_name || user.email }}</span>
+                        <button class="btn btn-ghost btn-sm" @click="$emit('logout')">
+                            ออกจากระบบ
+                        </button>
+                    </div>
+                    <img :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)" alt="User"
+                        class="user-avatar" />
+                </div>
+                <button v-else class="btn btn-primary" @click="$emit('login')">
+                    เข้าสู่ระบบ
+                </button>
+            </div>
+
+            <!-- Vercel Style Toggle -->
+            <button class="vercel-toggle" @click="$emit('toggle-mobile-menu')" aria-label="Toggle menu">
+                <div class="vercel-box" :class="{ 'is-active': mobileMenuOpen }">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                </div>
             </button>
-          </div>
         </div>
-        <button v-else class="btn btn-primary" @click="$emit('login')">
-          เข้าสู่ระบบ
-        </button>
 
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" @click="$emit('toggle-mobile-menu')" aria-label="Toggle menu">
-          <svg v-if="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-    </div>
+        <!-- Mobile Menu Overlay -->
+        <transition name="fade">
+            <div v-show="mobileMenuOpen" class="mobile-overlay">
+                <nav class="mobile-nav-links">
+                    <router-link to="/" class="mobile-link" @click="$emit('toggle-mobile-menu')">
+                        <div class="mobile-icon">💊</div>
+                        <div class="mobile-text">
+                            <strong>บัญชียา</strong>
+                            <small>รายการยาทั้งหมด</small>
+                        </div>
+                    </router-link>
+                    <router-link to="/decommissioned" class="mobile-link" @click="$emit('toggle-mobile-menu')">
+                        <div class="mobile-icon warning">⚠️</div>
+                        <div class="mobile-text">
+                            <strong>ยาที่นำออกจากบัญชี</strong>
+                            <small>ประวัติยาที่ยกเลิกใช้</small>
+                        </div>
+                    </router-link>
+                </nav>
 
-    <!-- Mobile Navigation -->
-    <nav class="navbar-nav mobile-nav" :class="{ 'mobile-nav-open': mobileMenuOpen }">
-      <router-link to="/" class="nav-link" @click="$emit('toggle-mobile-menu')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-        </svg>
-        <span>บัญชียา</span>
-      </router-link>
-      <router-link to="/decommissioned" class="nav-link" @click="$emit('toggle-mobile-menu')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="9" y1="15" x2="15" y2="9"></line>
-          <line x1="15" y1="15" x2="9" y2="9"></line>
-        </svg>
-        <span>ยาที่นำออกจากบัญชี</span>
-      </router-link>
-    </nav>
-  </header>
+                <div class="mobile-bottom">
+                    <div v-if="user" class="mobile-user-card">
+                        <div class="mobile-user-info">
+                            <img :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)"
+                                class="user-avatar-lg" />
+                            <div>
+                                <div class="font-bold">{{ user.user_metadata?.full_name || user.email }}</div>
+                                <small class="text-muted">ผู้ใช้งานระบบ</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger w-full" @click="$emit('logout')">
+                            ออกจากระบบ
+                        </button>
+                    </div>
+                    <div v-else class="p-4">
+                        <p class="text-center text-muted mb-3">กรุณาเข้าสู่ระบบเพื่อจัดการข้อมูล</p>
+                        <button class="btn btn-primary w-full" @click="$emit('login'); $emit('toggle-mobile-menu')">
+                            เข้าสู่ระบบ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </header>
 </template>
 
 <script setup>
-import { RouterLink } from 'vue-router'
+import { watch, onUnmounted } from 'vue'
 
-defineProps({ 
-  user: Object, 
-  mobileMenuOpen: Boolean,
-  isAdmin: Boolean
+const props = defineProps({
+    user: Object,
+    mobileMenuOpen: Boolean,
+    isAdmin: Boolean
 })
+
 defineEmits(['login', 'logout', 'toggle-mobile-menu'])
+
+const getAvatarUrl = (email) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=3b82f6&color=fff&bold=true`
+}
+
+watch(() => props.mobileMenuOpen, (isOpen) => {
+    document.body.style.overflow = isOpen ? 'hidden' : ''
+})
+
+onUnmounted(() => {
+    document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>
+/* Base Navbar */
 .navbar {
-  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-  border-bottom: 2px solid var(--c-border);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 72px;
-  backdrop-filter: blur(8px);
+    height: var(--nav-height);
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--c-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .navbar-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 /* Logo */
 .navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    z-index: 1001;
 }
 
 .logo-wrapper {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-  position: relative;
-}
-
-.logo-wrapper::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 2px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
 }
 
 .logo-icon {
-  font-size: 2rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    font-size: 1.4rem;
+    line-height: 1;
 }
 
 .logo-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .logo-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.75rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.03em;
-  line-height: 1;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.3;
+    padding-bottom: 2px;
+    margin-bottom: -4px;
 }
 
 .logo-subtitle {
-  font-size: 0.8rem;
-  color: var(--c-text-secondary);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+    font-size: 0.75rem;
+    color: var(--c-text-secondary);
+    font-weight: 500;
 }
 
-/* Desktop Navigation */
-.desktop-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-grow: 1;
-  justify-content: center;
+/* Desktop Nav */
+.desktop-nav,
+.desktop-actions {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .desktop-nav {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .desktop-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 }
 
 .nav-link {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-md);
-  color: var(--c-text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: var(--transition);
-  white-space: nowrap;
-  position: relative;
-}
-
-.nav-link::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 80%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--c-primary), transparent);
-  border-radius: 2px;
-  transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    color: var(--c-text-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--fs-small);
+    transition: var(--transition);
 }
 
 .nav-link:hover {
-  background-color: rgba(59, 130, 246, 0.08);
-  color: var(--c-primary);
-  transform: translateY(-1px);
+    background-color: var(--c-background);
+    color: var(--c-primary);
 }
 
-.nav-link.router-link-exact-active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%);
-  color: var(--c-primary);
-  font-weight: 700;
-  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.2);
+.nav-link.router-link-active {
+    background-color: var(--c-primary-light);
+    color: var(--c-primary-dark);
 }
 
-.nav-link.router-link-exact-active::before {
-  transform: translateX(-50%) scaleX(1);
-}
-
-.nav-link svg {
-  flex-shrink: 0;
-}
-
-/* User Section */
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
-}
-
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.5rem 1rem;
-  background: rgba(59, 130, 246, 0.04);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(59, 130, 246, 0.1);
-}
-
-.user-avatar-wrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2.5px solid var(--c-primary);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
-}
-
-.user-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.user-menu-desktop {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .user-name {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--c-text-primary);
-  line-height: 1.2;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--c-text-primary);
 }
 
-.logout-link {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  background: none;
-  border: none;
-  color: var(--c-text-muted);
-  font-size: 0.8125rem;
-  cursor: pointer;
-  padding: 0;
-  transition: var(--transition);
-  font-weight: 500;
-}
-
-.logout-link:hover {
-  color: var(--c-danger);
-}
-
-/* Mobile Menu Toggle */
-.mobile-menu-toggle {
-  display: none;
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  color: var(--c-primary);
-  cursor: pointer;
-  padding: 0.625rem;
-  border-radius: var(--radius-md);
-  transition: var(--transition);
-}
-
-.mobile-menu-toggle:hover {
-  background: rgba(59, 130, 246, 0.15);
-}
-
-/* Mobile Navigation */
-.mobile-nav {
-  display: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .navbar {
-    height: 64px;
-  }
-
-  .navbar-container {
-    padding: 0 1rem;
-  }
-
-  .logo-wrapper {
+.user-avatar {
     width: 40px;
     height: 40px;
-  }
+    border-radius: 50%;
+    border: 2px solid var(--c-background);
+    box-shadow: var(--shadow-sm);
+}
 
-  .logo-icon {
-    font-size: 1.5rem;
-  }
+.vercel-toggle {
+    /* Button Defaults */
+    appearance: none;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    padding: 0;
+    margin: 0;
+    outline: none;
 
-  .logo-text {
-    font-size: 1.375rem;
-  }
+    /* Shape & Size */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1001;
 
-  .logo-subtitle {
-    font-size: 0.7rem;
-  }
+    /* Perfect Centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  .desktop-nav {
-    display: none;
-  }
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
 
-  .user-info {
-    display: none;
-  }
+.vercel-toggle:hover {
+    border-color: var(--c-text-muted);
+}
 
-  .mobile-menu-toggle {
+/* Container for lines */
+.vercel-box {
+    width: 16px;
+    height: 12px;
+    position: relative;
     display: block;
-  }
+}
 
-  .mobile-nav {
+/* The Lines */
+.line {
+    position: absolute;
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--c-text-primary);
+    border-radius: 4px;
+    left: 0;
+    transition: transform 0.25s cubic-bezier(0.5, 0.1, 0.1, 1),
+        top 0.25s cubic-bezier(0.5, 0.1, 0.1, 1),
+        opacity 0.2s ease;
+}
+
+/* Position Lines - State Normal */
+.vercel-box .line:nth-child(1) {
+    top: 0;
+}
+
+.vercel-box .line:nth-child(2) {
+    top: 100%;
+    transform: translateY(-100%);
+}
+
+.vercel-box.is-active .line:nth-child(1) {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.vercel-box.is-active .line:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%) rotate(-45deg);
+}
+
+@media (min-width: 769px) {
+    .vercel-toggle {
+        display: none;
+    }
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--nav-height));
+    background-color: var(--c-surface);
     display: flex;
     flex-direction: column;
-    background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+    justify-content: space-between;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.mobile-nav-links {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--c-background);
+    text-decoration: none;
+    color: var(--c-text-primary);
+    border: 1px solid var(--c-border);
+    transition: var(--transition);
+}
+
+.mobile-link.router-link-active {
+    border-color: var(--c-primary);
+    background-color: var(--c-primary-light);
+    color: var(--c-primary-dark);
+}
+
+.mobile-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: var(--c-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.mobile-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-bottom {
+    padding: 1.5rem;
+    background-color: var(--c-background);
     border-top: 1px solid var(--c-border);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
+}
 
-  .mobile-nav-open {
-    max-height: 300px;
-    padding: 0.75rem;
-    border-top: 2px solid var(--c-primary);
-  }
+.mobile-user-card {
+    background: var(--c-surface);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-sm);
+}
 
-  .mobile-nav .nav-link {
+.mobile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.w-full {
     width: 100%;
-    justify-content: flex-start;
-    padding: 1rem 1.25rem;
-    font-size: 1.0625rem;
-  }
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: var(--fs-xs);
+}
+
+/* Fade Transition */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
 }
 </style>
