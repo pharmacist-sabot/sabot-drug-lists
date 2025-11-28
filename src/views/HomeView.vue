@@ -1,8 +1,10 @@
 <!-- src/views/HomeView.vue -->
 <script setup>
-import { ref, onMounted, watch, inject } from "vue";
-import { useDrugs } from "../composables/useDrugs";
-import { useAuth } from "../composables/useAuth";
+import { ref, onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { useDrugStore } from "../stores/drugs";
+import { useAuthStore } from "../stores/auth";
+import { useToastStore } from "../stores/toast";
 
 // Components
 import DrugTable from "../components/DrugTable.vue";
@@ -10,23 +12,14 @@ import CsvUploadModal from "../components/CsvUploadModal.vue";
 import DrugFormModal from "../components/DrugFormModal.vue";
 import DecommissionModal from "../components/DecommissionModal.vue";
 
-// -- Core Logic --
-const {
-    drugs,
-    loading,
-    filters,
-    currentPage,
-    totalPages,
-    totalCount,
-    fetchDrugs,
-    fetchCategories,
-    saveDrug: apiSaveDrug,
-    decommissionDrug: apiDecommissionDrug,
-    changePage,
-} = useDrugs({ status: "active" });
+// -- Stores --
+const drugStore = useDrugStore();
+const authStore = useAuthStore();
+const toastStore = useToastStore();
 
-const { isAdmin } = useAuth();
-const addToast = inject("addToast");
+// Destructure reactive state
+const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
+const { isAdmin } = storeToRefs(authStore);
 
 // -- Local UI State --
 const showCsvModal = ref(false);
@@ -38,25 +31,24 @@ let searchTimeout;
 
 // -- Initialization --
 onMounted(async () => {
-    allCategories.value = await fetchCategories();
-    await fetchDrugs();
+    drugStore.resetFilters();
+    allCategories.value = await drugStore.fetchCategories();
+    await drugStore.fetchDrugs('active');
 });
 
 // Watchers
 watch(
-    () => filters.searchTerm,
+    () => filters.value.searchTerm,
     () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            currentPage.value = 1;
-            fetchDrugs();
+            drugStore.fetchDrugs('active');
         }, 300);
     },
 );
 
-watch(() => filters.category, () => {
-    currentPage.value = 1;
-    fetchDrugs();
+watch(() => filters.value.category, () => {
+    drugStore.fetchDrugs('active');
 });
 
 // -- Handlers --
@@ -76,30 +68,32 @@ function openDecommissionModal(drug) {
 }
 
 async function handleSaveDrug(drugData) {
-    const result = await apiSaveDrug(drugData);
+    const result = await drugStore.saveDrug(drugData);
     if (result.success) {
         showDrugFormModal.value = false;
-        addToast("บันทึกข้อมูลยาสำเร็จ", "success");
-        allCategories.value = await fetchCategories();
+        toastStore.addToast("บันทึกข้อมูลยาสำเร็จ", "success");
+        await drugStore.fetchDrugs('active'); // Refresh list
+        allCategories.value = await drugStore.fetchCategories();
     } else {
-        addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
+        toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
     }
 }
 
 async function handleDecommission({ drug, remarks }) {
-    const result = await apiDecommissionDrug(drug, remarks);
+    const result = await drugStore.decommissionDrug(drug, remarks);
     if (result.success) {
         showDecommissionModal.value = false;
-        addToast(`นำยา "${drug.trade_name}" ออกจากบัญชีสำเร็จ`, "success");
+        toastStore.addToast(`นำยา "${drug.trade_name}" ออกจากบัญชีสำเร็จ`, "success");
+        await drugStore.fetchDrugs('active'); // Refresh list
     } else {
-        addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
+        toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
     }
 }
 
 async function onCsvSuccess() {
-    await fetchDrugs();
-    allCategories.value = await fetchCategories();
-    addToast("นำเข้าข้อมูลสำเร็จ!", "success");
+    await drugStore.fetchDrugs('active');
+    allCategories.value = await drugStore.fetchCategories();
+    // Toast handled in Modal, or here if we prefer consistency
 }
 </script>
 
@@ -135,11 +129,12 @@ async function onCsvSuccess() {
         </div>
 
         <!-- Table Section -->
+        <!-- Note: We bind to store filters directly -->
         <DrugTable :drugs="drugs" :loading="loading" :is-admin="isAdmin" :is-decommissioned-view="false"
             v-model:searchTerm="filters.searchTerm" v-model:filterCategory="filters.category"
             :available-categories="allCategories" :current-page="currentPage" :total-pages="totalPages"
             :total-count="totalCount" @edit="openEditDrugModal" @trigger-decommission="openDecommissionModal"
-            @change-page="changePage" />
+            @change-page="(p) => drugStore.changePage(p, 'active')" />
 
         <!-- Modals -->
         <CsvUploadModal :show="showCsvModal" @close="showCsvModal = false" @import-success="onCsvSuccess" />
@@ -210,7 +205,6 @@ async function onCsvSuccess() {
         width: 100%;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        /* Two equal columns */
     }
 
     .header-actions .btn {

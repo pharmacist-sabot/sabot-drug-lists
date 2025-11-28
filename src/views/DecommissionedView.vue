@@ -1,39 +1,34 @@
 <!-- src/views/DecommissionedView.vue -->
 <script setup>
-import { onMounted, watch, inject } from "vue";
-import { useDrugs } from "../composables/useDrugs";
-import { useAuth } from "../composables/useAuth";
+import { onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { useDrugStore } from "../stores/drugs";
+import { useAuthStore } from "../stores/auth";
+import { useToastStore } from "../stores/toast";
 import DrugTable from "../components/DrugTable.vue";
 
-// -- Core Logic --
-const {
-    drugs,
-    loading,
-    filters,
-    currentPage,
-    totalPages,
-    totalCount,
-    fetchDrugs,
-    recommissionDrug: apiRecommissionDrug,
-    changePage,
-} = useDrugs({ status: "decommissioned" });
+// -- Stores --
+const drugStore = useDrugStore();
+const authStore = useAuthStore();
+const toastStore = useToastStore();
 
-const { isAdmin } = useAuth();
-const addToast = inject("addToast");
+const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
+const { isAdmin } = storeToRefs(authStore);
+
 let searchTimeout;
 
 onMounted(() => {
-    fetchDrugs();
+    drugStore.resetFilters();
+    drugStore.fetchDrugs('decommissioned');
 });
 
 // Debounce search
 watch(
-    () => filters.searchTerm,
+    () => filters.value.searchTerm,
     () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            currentPage.value = 1;
-            fetchDrugs();
+            drugStore.fetchDrugs('decommissioned');
         }, 300);
     },
 );
@@ -43,12 +38,13 @@ async function handleRecommission(drug) {
         return;
     }
 
-    const result = await apiRecommissionDrug(drug);
+    const result = await drugStore.recommissionDrug(drug);
 
     if (result.success) {
-        addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, "success");
+        toastStore.addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, "success");
+        drugStore.fetchDrugs('decommissioned'); // Refresh list
     } else {
-        addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
+        toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
     }
 }
 </script>
@@ -66,7 +62,8 @@ async function handleRecommission(drug) {
         <!-- Table Section -->
         <DrugTable :drugs="drugs" :loading="loading" :is-admin="isAdmin" :is-decommissioned-view="true"
             v-model:searchTerm="filters.searchTerm" :current-page="currentPage" :total-pages="totalPages"
-            :total-count="totalCount" @recommission="handleRecommission" @change-page="changePage" />
+            :total-count="totalCount" @recommission="handleRecommission"
+            @change-page="(p) => drugStore.changePage(p, 'decommissioned')" />
     </div>
 </template>
 
