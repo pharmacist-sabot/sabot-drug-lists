@@ -2,6 +2,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { LogIn, AlertCircle } from 'lucide-vue-next'
 import { useAuthStore } from "./stores/auth";
 import { useToastStore } from "./stores/toast";
 import Navbar from "./components/Navbar.vue";
@@ -93,14 +94,7 @@ function toggleMobileMenu() {
                         </div>
 
                         <div v-if="loginError" class="alert alert-error">
-                            <!-- SVG Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
+                            <AlertCircle :size="18" />
                             <span>{{ loginError }}</span>
                         </div>
 
@@ -109,14 +103,7 @@ function toggleMobileMenu() {
                                 ยกเลิก
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <!-- SVG Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                    <polyline points="10 17 15 12 10 7"></polyline>
-                                    <line x1="15" y1="12" x2="3" y2="12"></line>
-                                </svg>
+                                <LogIn :size="18" />
                                 เข้าสู่ระบบ
                             </button>
                         </div>
@@ -128,7 +115,6 @@ function toggleMobileMenu() {
 </template>
 
 <style scoped>
-/* Keeping existing styles */
 .app {
     display: flex;
     flex-direction: column;

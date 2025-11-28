@@ -5,7 +5,7 @@
             <!-- Logo -->
             <router-link to="/" class="navbar-brand">
                 <div class="logo-wrapper">
-                    <span class="logo-icon">💊</span>
+                    <Pill class="logo-icon-svg" />
                 </div>
                 <div class="logo-content">
                     <span class="logo-text">DrugList</span>
@@ -16,21 +16,11 @@
             <!-- Desktop Navigation -->
             <nav class="desktop-nav">
                 <router-link to="/" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                    </svg>
+                    <FileText :size="20" />
                     <span>บัญชียา</span>
                 </router-link>
                 <router-link to="/decommissioned" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="9" y1="15" x2="15" y2="9"></line>
-                        <line x1="15" y1="15" x2="9" y2="9"></line>
-                    </svg>
+                    <ArchiveRestore :size="20" />
                     <span>ยาที่นำออกจากบัญชี</span>
                 </router-link>
             </nav>
@@ -52,7 +42,6 @@
                 </button>
             </div>
 
-            <!-- Vercel Style Toggle -->
             <button class="vercel-toggle" @click="$emit('toggle-mobile-menu')" aria-label="Toggle menu">
                 <div class="vercel-box" :class="{ 'is-active': mobileMenuOpen }">
                     <span class="line"></span>
@@ -66,14 +55,18 @@
             <div v-show="mobileMenuOpen" class="mobile-overlay">
                 <nav class="mobile-nav-links">
                     <router-link to="/" class="mobile-link" @click="$emit('toggle-mobile-menu')">
-                        <div class="mobile-icon">💊</div>
+                        <div class="mobile-icon">
+                            <FileText :size="24" />
+                        </div>
                         <div class="mobile-text">
                             <strong>บัญชียา</strong>
                             <small>รายการยาทั้งหมด</small>
                         </div>
                     </router-link>
                     <router-link to="/decommissioned" class="mobile-link" @click="$emit('toggle-mobile-menu')">
-                        <div class="mobile-icon warning">⚠️</div>
+                        <div class="mobile-icon warning">
+                            <ArchiveRestore :size="24" />
+                        </div>
                         <div class="mobile-text">
                             <strong>ยาที่นำออกจากบัญชี</strong>
                             <small>ประวัติยาที่ยกเลิกใช้</small>
@@ -92,12 +85,14 @@
                             </div>
                         </div>
                         <button class="btn btn-danger w-full" @click="$emit('logout')">
+                            <LogOut :size="16" style="margin-right: 8px;" />
                             ออกจากระบบ
                         </button>
                     </div>
                     <div v-else class="p-4">
                         <p class="text-center text-muted mb-3">กรุณาเข้าสู่ระบบเพื่อจัดการข้อมูล</p>
                         <button class="btn btn-primary w-full" @click="$emit('login'); $emit('toggle-mobile-menu')">
+                            <LogIn :size="16" style="margin-right: 8px;" />
                             เข้าสู่ระบบ
                         </button>
                     </div>
@@ -109,6 +104,7 @@
 
 <script setup>
 import { watch, onUnmounted } from 'vue'
+import { Pill, FileText, ArchiveRestore, LogOut, LogIn } from 'lucide-vue-next'
 
 const props = defineProps({
     user: Object,
@@ -132,7 +128,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Base Navbar */
 .navbar {
     height: var(--nav-height);
     background-color: rgba(255, 255, 255, 0.9);
@@ -154,7 +149,6 @@ onUnmounted(() => {
     justify-content: space-between;
 }
 
-/* Logo */
 .navbar-brand {
     display: flex;
     align-items: center;
@@ -174,9 +168,10 @@ onUnmounted(() => {
     box-shadow: var(--shadow-sm);
 }
 
-.logo-icon {
-    font-size: 1.4rem;
-    line-height: 1;
+.logo-icon-svg {
+    color: white;
+    width: 20px;
+    height: 20px;
 }
 
 .logo-content {
@@ -273,26 +268,20 @@ onUnmounted(() => {
 }
 
 .vercel-toggle {
-    /* Button Defaults */
     appearance: none;
     background: var(--c-surface);
     border: 1px solid var(--c-border);
     padding: 0;
     margin: 0;
     outline: none;
-
-    /* Shape & Size */
     width: 40px;
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
     z-index: 1001;
-
-    /* Perfect Centering */
     display: flex;
     align-items: center;
     justify-content: center;
-
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
@@ -300,7 +289,6 @@ onUnmounted(() => {
     border-color: var(--c-text-muted);
 }
 
-/* Container for lines */
 .vercel-box {
     width: 16px;
     height: 12px;
@@ -308,7 +296,6 @@ onUnmounted(() => {
     display: block;
 }
 
-/* The Lines */
 .line {
     position: absolute;
     width: 100%;
@@ -321,7 +308,6 @@ onUnmounted(() => {
         opacity 0.2s ease;
 }
 
-/* Position Lines - State Normal */
 .vercel-box .line:nth-child(1) {
     top: 0;
 }
@@ -347,7 +333,6 @@ onUnmounted(() => {
     }
 }
 
-/* Mobile Overlay */
 .mobile-overlay {
     position: fixed;
     top: var(--nav-height);
@@ -394,10 +379,14 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
     background: var(--c-surface);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
+    color: var(--c-primary);
+}
+
+.mobile-icon.warning {
+    color: var(--c-warning);
 }
 
 .mobile-text {
