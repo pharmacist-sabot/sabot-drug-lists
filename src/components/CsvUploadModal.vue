@@ -1,9 +1,9 @@
-<!-- src/components/CsvUploadModal.vue -->
 <script setup>
 import { ref } from 'vue'
 import Papa from 'papaparse'
 import { supabase } from '../supabaseClient'
 import { useToastStore } from '../stores/toast'
+import { X, FileSpreadsheet, UploadCloud } from 'lucide-vue-next'
 
 defineProps({ show: Boolean })
 const emit = defineEmits(['close', 'import-success'])
@@ -29,8 +29,6 @@ function processImport() {
         header: true,
         skipEmptyLines: true,
         complete: async (results) => {
-            toastStore.addToast(`พบข้อมูล ${results.data.length} รายการ กำลังนำเข้า...`, 'info')
-
             const drugsToInsert = results.data.map(row => ({
                 drug_code: row['รหัสเวชภัณฑ์'] || null,
                 trade_name: row['ชื่อเวชภัณฑ์'] || null,
@@ -54,7 +52,6 @@ function processImport() {
             isLoading.value = false
             if (error) {
                 toastStore.addToast(`เกิดข้อผิดพลาด: ${error.message}`, 'error')
-                console.error(error)
             } else {
                 toastStore.addToast(`นำเข้าข้อมูล ${drugsToInsert.length} รายการสำเร็จ!`, 'success')
                 emit('import-success')
@@ -70,75 +67,59 @@ function processImport() {
 </script>
 
 <template>
-    <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
-        <div class="modal-content card" :class="{ 'modal-animate': show }">
-            <h2>นำเข้าข้อมูลยาจากไฟล์ CSV</h2>
-            <p>ไฟล์ CSV ต้องมี header ตรงกับที่ระบบกำหนด เช่น รหัสเวชภัณฑ์, ชื่อเวชภัณฑ์, Generic name เป็นต้น</p>
-            <div class="form-group">
-                <label for="csv-file">เลือกไฟล์ .csv</label>
-                <input type="file" id="csv-file" @change="handleFileChange" accept=".csv" />
+    <Transition name="modal">
+        <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" @click="$emit('close')">
             </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" @click="processImport" :disabled="isLoading">
-                    {{ isLoading ? 'กำลังนำเข้า...' : 'เริ่มนำเข้า' }}
-                </button>
-                <button class="btn" @click="$emit('close')" :disabled="isLoading">ยกเลิก</button>
+
+            <div
+                class="modal-panel relative bg-white w-full max-w-lg rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden transform border border-slate-100">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-semibold text-slate-900 text-lg">นำเข้าไฟล์ CSV</h3>
+                    <button @click="$emit('close')"
+                        class="p-2 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400 hover:text-slate-600">
+                        <X :size="20" />
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <div
+                        class="mb-6 text-center border-2 border-dashed border-slate-200 rounded-2xl p-8 hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
+                        <div
+                            class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <FileSpreadsheet :size="24" />
+                        </div>
+                        <label for="csv-file" class="cursor-pointer">
+                            <span class="block font-semibold text-slate-700">เลือกไฟล์ .csv</span>
+                            <span class="text-sm text-slate-400">คลิกเพื่อเลือกไฟล์จากเครื่องของคุณ</span>
+                            <input type="file" id="csv-file" @change="handleFileChange" accept=".csv" class="hidden" />
+                        </label>
+                        <div v-if="file"
+                            class="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">
+                            {{ file.name }}
+                        </div>
+                    </div>
+
+                    <div class="text-sm text-slate-500 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <p class="font-semibold mb-2 text-slate-700">ข้อกำหนดไฟล์ CSV:</p>
+                        <p>ต้องมี Header: <code class="text-xs bg-white border px-1 rounded">รหัสเวชภัณฑ์</code>, <code
+                                class="text-xs bg-white border px-1 rounded">ชื่อเวชภัณฑ์</code>, <code
+                                class="text-xs bg-white border px-1 rounded">Generic name</code></p>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <button
+                            class="px-5 py-2.5 rounded-xl font-medium text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all"
+                            @click="$emit('close')" :disabled="isLoading">ยกเลิก</button>
+                        <button
+                            class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 flex items-center gap-2"
+                            @click="processImport" :disabled="isLoading">
+                            <UploadCloud :size="16" />
+                            {{ isLoading ? 'กำลังประมวลผล...' : 'เริ่มนำเข้า' }}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </Transition>
 </template>
-
-<style scoped>
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    width: 90%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    transform: scale(0.95);
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.modal-animate {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-.message {
-    margin-top: 1rem;
-    font-weight: 500;
-    text-align: center;
-}
-
-input[type="file"] {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-}
-
-@media (max-width: 768px) {
-    .modal-content {
-        width: 95%;
-    }
-}
-</style>

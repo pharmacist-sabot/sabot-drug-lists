@@ -2,10 +2,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
     vue(),
+    tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate', // อัปเดตเนื้อหาใหม่อัตโนมัติเมื่อมีการ deploy
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],

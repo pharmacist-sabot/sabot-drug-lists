@@ -1,12 +1,14 @@
-<!-- src/components/DrugTable.vue -->
 <template>
-    <div class="card">
-        <div class="controls">
-            <SearchBar :model-value="searchTerm" @update:model-value="$emit('update:searchTerm', $event)" />
-
-            <div class="filters" v-if="!isDecommissionedView">
-                <select :value="filterCategory" @change="$emit('update:filterCategory', $event.target.value)">
-                    <option value="all">ทุกหมวดหมู่ (Category)</option>
+    <div class="flex flex-col gap-6">
+        <!-- Controls & Filters -->
+        <div class="flex flex-col sm:flex-row gap-4">
+            <div class="relative flex-1">
+                <SearchBar :model-value="searchTerm" @update:model-value="$emit('update:searchTerm', $event)" />
+            </div>
+            <div class="sm:w-48" v-if="!isDecommissionedView">
+                <select :value="filterCategory" @change="$emit('update:filterCategory', $event.target.value)"
+                    class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm appearance-none cursor-pointer">
+                    <option value="all">ทุกหมวดหมู่</option>
                     <option v-for="cat in availableCategories" :key="cat" :value="cat">
                         {{ cat }}
                     </option>
@@ -14,81 +16,113 @@
             </div>
         </div>
 
-        <div class="table-container">
-            <div v-if="loading" class="loading-state">
-                <Loader2 class="animate-spin" :size="32" />
+        <!-- Card List View -->
+        <div
+            class="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden min-h-[400px] flex flex-col">
+
+            <!-- Loading -->
+            <div v-if="loading" class="flex-1 flex flex-col items-center justify-center p-12 text-slate-400">
+                <Loader2 class="animate-spin mb-3 text-blue-500" :size="32" />
                 <p>กำลังโหลดข้อมูล...</p>
             </div>
-            <table v-else-if="drugs.length > 0" class="drug-table">
-                <thead>
-                    <tr>
-                        <th>รหัส / ชื่อยา</th>
-                        <th v-if="isDecommissionedView">เหตุผลที่นำออก / วันที่</th>
-                        <th v-else>สถานะ</th>
-                        <th v-if="isAdmin"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="drug in drugs" :key="drug.id" class="table-row">
-                        <td data-label="ชื่อยา">
-                            <div class="drug-name-cell">
-                                <span class="drug-code">{{ drug.drug_code }}</span>
-                                <span class="trade-name">{{ drug.trade_name }}</span>
-                            </div>
-                        </td>
 
-                        <td v-if="isDecommissionedView" data-label="เหตุผล">
-                            <div class="remarks-cell">
-                                <span class="remarks-text">{{ drug.remarks }}</span>
-                                <span class="date-text">{{ formatDate(drug.decommissioned_at) }}</span>
-                            </div>
-                        </td>
-                        <td v-else data-label="สถานะ">
-                            <span :class="['tag', drug.is_active ? 'tag-active' : 'tag-inactive']">
-                                {{ drug.is_active ? 'ใช้งาน' : 'ไม่ใช้งาน' }}
-                            </span>
-                        </td>
+            <!-- Empty State -->
+            <div v-else-if="drugs.length === 0"
+                class="flex-1 flex flex-col items-center justify-center p-20 text-slate-400">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                    <SearchX :size="32" class="opacity-50" />
+                </div>
+                <p class="text-lg font-medium text-slate-600">ไม่พบข้อมูลยา</p>
+                <p class="text-sm">ลองปรับคำค้นหาหรือตัวกรองใหม่อีกครั้ง</p>
+            </div>
 
-                        <td v-if="isAdmin" class="actions-cell">
+            <!-- List Data -->
+            <div v-else class="divide-y divide-slate-100">
+                <div v-for="drug in drugs" :key="drug.id"
+                    class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-slate-50 transition-colors gap-4 sm:gap-0">
+
+                    <!-- Drug Info Left -->
+                    <div class="flex items-start gap-4">
+                        <div :class="[
+                            'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1',
+                            drug.is_active ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-500'
+                        ]">
+                            <Pill :size="20" />
+                        </div>
+                        <div>
+                            <div class="flex items-center flex-wrap gap-2 mb-1">
+                                <span class="font-semibold text-slate-900 text-base">{{ drug.trade_name }}</span>
+                                <span
+                                    class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100">
+                                    บัญชี {{ drug.account }}
+                                </span>
+                                <span v-if="!drug.is_active"
+                                    class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-600 border border-amber-100">
+                                    Decommissioned
+                                </span>
+                            </div>
+                            <div class="text-sm text-slate-500 flex flex-wrap gap-x-3 gap-y-1 items-center">
+                                <span
+                                    class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 border border-slate-200">
+                                    {{ drug.drug_code }}
+                                </span>
+                                <span>{{ drug.generic_name }}</span>
+                                <span class="text-slate-300 hidden sm:inline">•</span>
+                                <span>{{ drug.category }}</span>
+                            </div>
+                            <!-- Remarks Display -->
+                            <div v-if="isDecommissionedView && drug.remarks"
+                                class="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded-lg inline-block border border-red-100">
+                                <span class="font-semibold">เหตุผล:</span> {{ drug.remarks }}
+                                <div class="text-xs text-red-400 mt-1">{{ formatDate(drug.decommissioned_at) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Right -->
+                    <div class="flex items-center gap-6 sm:justify-end pl-14 sm:pl-0">
+                        <div class="text-right hidden sm:block min-w-[80px]">
+                            <div class="text-sm font-semibold text-slate-900">฿{{ (drug.price_opd || 0).toFixed(2) }}
+                            </div>
+                            <div class="text-xs text-slate-400">ราคา OPD</div>
+                        </div>
+
+                        <!-- Admin Actions -->
+                        <div v-if="isAdmin" class="flex items-center gap-2 transition-opacity">
                             <template v-if="!isDecommissionedView">
-                                <button @click="$emit('edit', drug)" class="action-btn" title="แก้ไข"
-                                    aria-label="แก้ไขข้อมูลยา">
-                                    <Pencil :size="18" />
+                                <button @click="$emit('edit', drug)"
+                                    class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 text-sm font-medium transition-all">
+                                    แก้ไข
                                 </button>
-                                <button @click="$emit('trigger-decommission', drug)" class="action-btn btn-danger-text"
-                                    title="ปิดใช้งาน" aria-label="ปิดใช้งานยานี้">
-                                    <Ban :size="18" />
+                                <button @click="$emit('trigger-decommission', drug)"
+                                    class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="นำออกจากบัญชี">
+                                    <Archive :size="18" />
                                 </button>
                             </template>
                             <template v-else>
-                                <button @click="$emit('recommission', drug)" class="action-btn btn-success-text"
-                                    title="นำกลับเข้าบัญชี" aria-label="นำกลับเข้าบัญชี">
-                                    <RotateCcw :size="18" />
+                                <button @click="$emit('recommission', drug)"
+                                    class="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 text-sm font-medium transition-all">
+                                    <RotateCcw :size="16" />
+                                    นำกลับเข้าบัญชี
                                 </button>
                             </template>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div v-else class="empty-state">
-                <div class="empty-icon">
-                    <SearchX :size="48" />
+                        </div>
+                    </div>
                 </div>
-                <h3>ไม่พบข้อมูล</h3>
-                <p>ไม่พบรายการยาที่ตรงกับเงื่อนไขการค้นหาของคุณ</p>
             </div>
         </div>
 
-        <div v-if="!loading && totalPages > 1" class="pagination-controls">
-            <span>หน้าที่ {{ currentPage }} / {{ totalPages }} (ทั้งหมด {{ totalCount }} รายการ)</span>
-            <div class="pagination-buttons">
-                <button class="btn btn-secondary" @click="$emit('change-page', currentPage - 1)"
-                    :disabled="currentPage === 1">
-                    <ChevronLeft :size="16" /> ก่อนหน้า
+        <!-- Pagination -->
+        <div v-if="!loading && totalPages > 1" class="flex items-center justify-between text-sm text-slate-500">
+            <p>หน้า {{ currentPage }} จาก {{ totalPages }} (รวม {{ totalCount }} รายการ)</p>
+            <div class="flex gap-2">
+                <button @click="$emit('change-page', currentPage - 1)" :disabled="currentPage === 1"
+                    class="p-2 border border-slate-200 rounded-lg hover:bg-white bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    <ChevronLeft :size="16" />
                 </button>
-                <button class="btn btn-secondary" @click="$emit('change-page', currentPage + 1)"
-                    :disabled="currentPage >= totalPages">
-                    ถัดไป
+                <button @click="$emit('change-page', currentPage + 1)" :disabled="currentPage >= totalPages"
+                    class="p-2 border border-slate-200 rounded-lg hover:bg-white bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                     <ChevronRight :size="16" />
                 </button>
             </div>
@@ -98,8 +132,7 @@
 
 <script setup>
 import SearchBar from './SearchBar.vue'
-// Import Icons
-import { Pencil, Ban, RotateCcw, Loader2, SearchX, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { Archive, RotateCcw, Loader2, SearchX, ChevronLeft, ChevronRight, Pill } from 'lucide-vue-next'
 
 const props = defineProps({
     drugs: Array,
@@ -133,265 +166,3 @@ function formatDate(dateString) {
     })
 }
 </script>
-
-<style scoped>
-.remarks-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.remarks-text {
-    color: var(--c-text-primary);
-    font-weight: 500;
-}
-
-.date-text {
-    font-size: 0.85rem;
-    color: var(--c-text-secondary);
-}
-
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.filters {
-    display: flex;
-    gap: 1rem;
-}
-
-.filters select {
-    padding: 0.75rem 1.25rem;
-    border: 1px solid var(--c-border);
-    border-radius: 8px;
-    background-color: var(--c-surface);
-    color: var(--c-text-primary);
-    transition: var(--transition);
-}
-
-.filters select:focus {
-    border-color: var(--c-primary);
-    box-shadow: 0 0 0 3px var(--c-primary-light);
-}
-
-.table-container {
-    overflow-y: auto;
-    max-height: calc(70vh - 60px);
-}
-
-.drug-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.drug-table th {
-    text-align: left;
-    padding: 1rem 1.25rem;
-    color: var(--c-text-secondary);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    border-bottom: 2px solid var(--c-border);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: var(--c-surface);
-}
-
-.drug-table td {
-    padding: 1.25rem 1.25rem;
-    border-bottom: 1px solid var(--c-border);
-    vertical-align: middle;
-}
-
-.drug-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.table-row {
-    transition: var(--transition);
-}
-
-.table-row:hover {
-    background-color: var(--c-primary-light);
-}
-
-.drug-name-cell {
-    display: flex;
-    flex-direction: column;
-}
-
-.drug-code {
-    font-size: 0.85rem;
-    color: var(--c-text-secondary);
-}
-
-.trade-name {
-    font-weight: 500;
-    color: var(--c-text-primary);
-}
-
-.actions-cell {
-    text-align: right;
-    white-space: nowrap;
-}
-
-.action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: var(--transition);
-    color: var(--c-text-secondary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.action-btn:hover {
-    background-color: var(--c-background);
-    color: var(--c-primary);
-    transform: scale(1.1);
-}
-
-/* Specific colors for actions */
-.btn-danger-text:hover {
-    color: var(--c-danger);
-    background-color: var(--c-danger-light);
-}
-
-.btn-success-text {
-    color: var(--c-success);
-}
-
-.btn-success-text:hover {
-    color: #15803d;
-    background-color: var(--c-success-light);
-}
-
-/* Loading & Empty States */
-.loading-state,
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: var(--c-text-secondary);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.empty-icon {
-    color: var(--c-text-muted);
-    opacity: 0.5;
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
-    color: var(--c-primary);
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.empty-state h3 {
-    font-size: 1.2rem;
-    color: var(--c-text-primary);
-    margin: 0;
-}
-
-.pagination-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1.5rem;
-    margin-top: 1rem;
-    border-top: 1px solid var(--c-border);
-    color: var(--c-text-secondary);
-}
-
-.pagination-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.pagination-controls .btn {
-    padding: 0.5rem 1rem;
-}
-
-@media (max-width: 768px) {
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filters {
-        flex-direction: column;
-    }
-
-    .filters select {
-        width: 100%;
-    }
-
-    .table-container {
-        max-height: none;
-        overflow-y: visible;
-    }
-
-    .drug-table thead {
-        display: none;
-    }
-
-    .drug-table tr {
-        display: block;
-        margin-bottom: 1.25rem;
-        border: 1px solid var(--c-border);
-        border-radius: 12px;
-        padding: 1rem;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .drug-table td {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        padding: 0.75rem 0;
-        border: none;
-    }
-
-    .drug-table td::before {
-        content: attr(data-label);
-        font-weight: 700;
-        color: var(--c-text-secondary);
-        margin-right: 1rem;
-        min-width: 100px;
-    }
-
-    .drug-table .actions-cell {
-        justify-content: flex-end;
-        gap: 1rem;
-    }
-
-    .drug-table .actions-cell::before {
-        display: none;
-    }
-
-    .pagination-controls {
-        flex-direction: column;
-        gap: 1rem;
-    }
-}
-</style>

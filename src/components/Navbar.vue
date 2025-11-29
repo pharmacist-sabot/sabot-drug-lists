@@ -1,110 +1,107 @@
-<!-- src/components/Navbar.vue -->
 <template>
-    <header class="navbar">
-        <div class="navbar-container">
-            <!-- Logo -->
-            <router-link to="/" class="navbar-brand">
-                <div class="logo-wrapper">
-                    <Pill class="logo-icon-svg" />
-                </div>
-                <div class="logo-content">
-                    <span class="logo-text">DrugList</span>
-                    <span class="logo-subtitle">โรงพยาบาลสระโบสถ์</span>
-                </div>
-            </router-link>
-
-            <!-- Desktop Navigation -->
-            <nav class="desktop-nav">
-                <router-link to="/" class="nav-link">
-                    <FileText :size="20" />
-                    <span>บัญชียา</span>
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 supports-[backdrop-filter]:bg-white/60 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <router-link to="/" class="flex items-center gap-3 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/40 transition-all">
+                        <Pill :size="18" />
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-slate-900 tracking-tight leading-none text-lg">DrugList</h1>
+                        <span class="text-[10px] text-slate-500 font-medium tracking-wider uppercase">Sabot Hospital</span>
+                    </div>
                 </router-link>
-                <router-link to="/decommissioned" class="nav-link">
-                    <ArchiveRestore :size="20" />
-                    <span>ยาที่นำออกจากบัญชี</span>
-                </router-link>
-            </nav>
+            </div>
 
-            <!-- Desktop Actions -->
-            <div class="desktop-actions">
-                <div v-if="user" class="user-menu-desktop">
-                    <div class="user-info">
-                        <span class="user-name">{{ user.user_metadata?.full_name || user.email }}</span>
-                        <button class="btn btn-ghost btn-sm" @click="$emit('logout')">
-                            ออกจากระบบ
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-6">
+                <nav class="flex items-center gap-1 bg-slate-100/50 p-1 rounded-xl">
+                    <router-link to="/" custom v-slot="{ navigate, isActive }">
+                        <button @click="navigate" :class="[
+                            'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                            isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                        ]">
+                            <FileSpreadsheet :size="16" />
+                            บัญชียา
                         </button>
+                    </router-link>
+                    <router-link to="/decommissioned" custom v-slot="{ navigate, isActive }">
+                        <button @click="navigate" :class="[
+                            'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                            isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                        ]">
+                            <ArchiveRestore :size="16" />
+                            ประวัติการยกเลิก
+                        </button>
+                    </router-link>
+                </nav>
+
+                <div class="h-6 w-px bg-slate-200"></div>
+
+                <!-- User Profile / Login -->
+                <div v-if="user" class="flex items-center gap-3">
+                    <div class="text-right hidden lg:block">
+                        <div class="text-xs font-semibold text-slate-900">{{ user.user_metadata?.full_name || user.email }}</div>
+                        <div class="text-[10px] text-slate-500 uppercase">{{ isAdmin ? 'Administrator' : 'Viewer' }}</div>
                     </div>
                     <img :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)" alt="User"
-                        class="user-avatar" />
+                        class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm cursor-pointer hover:ring-blue-100 transition-all"
+                        @click="$emit('logout')" title="คลิกเพื่อออกจากระบบ" />
                 </div>
-                <button v-else class="btn btn-primary" @click="$emit('login')">
+                <button v-else @click="$emit('login')"
+                    class="bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 hover:shadow-slate-900/30 px-5 py-2 rounded-xl text-sm font-medium transition-all">
                     เข้าสู่ระบบ
                 </button>
             </div>
 
-            <button class="vercel-toggle" @click="$emit('toggle-mobile-menu')" aria-label="Toggle menu">
-                <div class="vercel-box" :class="{ 'is-active': mobileMenuOpen }">
-                    <span class="line"></span>
-                    <span class="line"></span>
-                </div>
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-slate-500 hover:text-slate-900 p-2" @click="$emit('toggle-mobile-menu')">
+                <Menu v-if="!mobileMenuOpen" />
+                <X v-else />
             </button>
         </div>
 
         <!-- Mobile Menu Overlay -->
-        <transition name="fade">
-            <div v-show="mobileMenuOpen" class="mobile-overlay">
-                <nav class="mobile-nav-links">
-                    <router-link to="/" class="mobile-link" @click="$emit('toggle-mobile-menu')">
-                        <div class="mobile-icon">
-                            <FileText :size="24" />
-                        </div>
-                        <div class="mobile-text">
-                            <strong>บัญชียา</strong>
-                            <small>รายการยาทั้งหมด</small>
-                        </div>
-                    </router-link>
-                    <router-link to="/decommissioned" class="mobile-link" @click="$emit('toggle-mobile-menu')">
-                        <div class="mobile-icon warning">
-                            <ArchiveRestore :size="24" />
-                        </div>
-                        <div class="mobile-text">
-                            <strong>ยาที่นำออกจากบัญชี</strong>
-                            <small>ประวัติยาที่ยกเลิกใช้</small>
-                        </div>
-                    </router-link>
-                </nav>
-
-                <div class="mobile-bottom">
-                    <div v-if="user" class="mobile-user-card">
-                        <div class="mobile-user-info">
-                            <img :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)"
-                                class="user-avatar-lg" />
-                            <div>
-                                <div class="font-bold">{{ user.user_metadata?.full_name || user.email }}</div>
-                                <small class="text-muted">ผู้ใช้งานระบบ</small>
-                            </div>
-                        </div>
-                        <button class="btn btn-danger w-full" @click="$emit('logout')">
-                            <LogOut :size="16" style="margin-right: 8px;" />
-                            ออกจากระบบ
-                        </button>
+        <div v-if="mobileMenuOpen" class="md:hidden border-t border-slate-100 bg-white absolute w-full left-0 shadow-xl">
+            <div class="px-4 py-4 space-y-2">
+                <router-link to="/" class="block" @click="$emit('toggle-mobile-menu')">
+                    <div class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                        :class="$route.path === '/' ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-600'">
+                        <FileSpreadsheet :size="18" /> บัญชียา
                     </div>
-                    <div v-else class="p-4">
-                        <p class="text-center text-muted mb-3">กรุณาเข้าสู่ระบบเพื่อจัดการข้อมูล</p>
-                        <button class="btn btn-primary w-full" @click="$emit('login'); $emit('toggle-mobile-menu')">
-                            <LogIn :size="16" style="margin-right: 8px;" />
-                            เข้าสู่ระบบ
-                        </button>
+                </router-link>
+                <router-link to="/decommissioned" class="block" @click="$emit('toggle-mobile-menu')">
+                    <div class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                        :class="$route.path === '/decommissioned' ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-600'">
+                        <ArchiveRestore :size="18" /> ประวัติการยกเลิก
+                    </div>
+                </router-link>
+
+                <div class="border-t border-slate-100 my-2 pt-2">
+                    <div v-if="user" class="px-4 py-3">
+                         <div class="flex items-center gap-3 mb-3">
+                            <img :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)" class="w-10 h-10 rounded-full" />
+                            <div>
+                                <div class="font-semibold text-slate-900">{{ user.user_metadata?.full_name || user.email }}</div>
+                                <div class="text-xs text-slate-500">{{ isAdmin ? 'Administrator' : 'Viewer' }}</div>
+                            </div>
+                         </div>
+                         <button @click="$emit('logout')" class="w-full bg-slate-100 text-slate-700 py-2 rounded-lg text-sm font-medium hover:bg-red-50 hover:text-red-600 transition-colors">ออกจากระบบ</button>
+                    </div>
+                    <div v-else class="px-4 pb-2">
+                        <button @click="$emit('login'); $emit('toggle-mobile-menu')" class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-medium shadow-lg shadow-slate-900/20">เข้าสู่ระบบ</button>
                     </div>
                 </div>
             </div>
-        </transition>
+        </div>
     </header>
 </template>
 
 <script setup>
 import { watch, onUnmounted } from 'vue'
-import { Pill, FileText, ArchiveRestore, LogOut, LogIn } from 'lucide-vue-next'
+import { Pill, ArchiveRestore, Menu, X, FileSpreadsheet } from 'lucide-vue-next'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
     user: Object,
@@ -113,9 +110,10 @@ const props = defineProps({
 })
 
 defineEmits(['login', 'logout', 'toggle-mobile-menu'])
+const route = useRoute()
 
 const getAvatarUrl = (email) => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=3b82f6&color=fff&bold=true`
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=0f172a&color=fff&bold=true`
 }
 
 watch(() => props.mobileMenuOpen, (isOpen) => {
@@ -126,319 +124,3 @@ onUnmounted(() => {
     document.body.style.overflow = ''
 })
 </script>
-
-<style scoped>
-.navbar {
-    height: var(--nav-height);
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--c-border);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.navbar-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-decoration: none;
-    z-index: 1001;
-}
-
-.logo-wrapper {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-sm);
-}
-
-.logo-icon-svg {
-    color: white;
-    width: 20px;
-    height: 20px;
-}
-
-.logo-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.logo-text {
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    font-size: 1.5rem;
-    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.3;
-    padding-bottom: 2px;
-    margin-bottom: -4px;
-}
-
-.logo-subtitle {
-    font-size: 0.75rem;
-    color: var(--c-text-secondary);
-    font-weight: 500;
-}
-
-/* Desktop Nav */
-.desktop-nav,
-.desktop-actions {
-    display: none;
-}
-
-@media (min-width: 769px) {
-    .desktop-nav {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .desktop-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    color: var(--c-text-secondary);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: var(--fs-small);
-    transition: var(--transition);
-}
-
-.nav-link:hover {
-    background-color: var(--c-background);
-    color: var(--c-primary);
-}
-
-.nav-link.router-link-active {
-    background-color: var(--c-primary-light);
-    color: var(--c-primary-dark);
-}
-
-.user-menu-desktop {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.user-info {
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.user-name {
-    font-size: var(--fs-small);
-    font-weight: 600;
-    color: var(--c-text-primary);
-}
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid var(--c-background);
-    box-shadow: var(--shadow-sm);
-}
-
-.vercel-toggle {
-    appearance: none;
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    padding: 0;
-    margin: 0;
-    outline: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.vercel-toggle:hover {
-    border-color: var(--c-text-muted);
-}
-
-.vercel-box {
-    width: 16px;
-    height: 12px;
-    position: relative;
-    display: block;
-}
-
-.line {
-    position: absolute;
-    width: 100%;
-    height: 1.5px;
-    background-color: var(--c-text-primary);
-    border-radius: 4px;
-    left: 0;
-    transition: transform 0.25s cubic-bezier(0.5, 0.1, 0.1, 1),
-        top 0.25s cubic-bezier(0.5, 0.1, 0.1, 1),
-        opacity 0.2s ease;
-}
-
-.vercel-box .line:nth-child(1) {
-    top: 0;
-}
-
-.vercel-box .line:nth-child(2) {
-    top: 100%;
-    transform: translateY(-100%);
-}
-
-.vercel-box.is-active .line:nth-child(1) {
-    top: 50%;
-    transform: translateY(-50%) rotate(45deg);
-}
-
-.vercel-box.is-active .line:nth-child(2) {
-    top: 50%;
-    transform: translateY(-50%) rotate(-45deg);
-}
-
-@media (min-width: 769px) {
-    .vercel-toggle {
-        display: none;
-    }
-}
-
-.mobile-overlay {
-    position: fixed;
-    top: var(--nav-height);
-    left: 0;
-    width: 100%;
-    height: calc(100vh - var(--nav-height));
-    background-color: var(--c-surface);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    z-index: 1000;
-    overflow-y: auto;
-}
-
-.mobile-nav-links {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.mobile-link {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: var(--radius-lg);
-    background-color: var(--c-background);
-    text-decoration: none;
-    color: var(--c-text-primary);
-    border: 1px solid var(--c-border);
-    transition: var(--transition);
-}
-
-.mobile-link.router-link-active {
-    border-color: var(--c-primary);
-    background-color: var(--c-primary-light);
-    color: var(--c-primary-dark);
-}
-
-.mobile-icon {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--c-surface);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    color: var(--c-primary);
-}
-
-.mobile-icon.warning {
-    color: var(--c-warning);
-}
-
-.mobile-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-bottom {
-    padding: 1.5rem;
-    background-color: var(--c-background);
-    border-top: 1px solid var(--c-border);
-}
-
-.mobile-user-card {
-    background: var(--c-surface);
-    padding: 1rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--c-border);
-    box-shadow: var(--shadow-sm);
-}
-
-.mobile-user-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.user-avatar-lg {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-}
-
-.w-full {
-    width: 100%;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: var(--fs-xs);
-}
-
-/* Fade Transition */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-    transform: translateY(10px);
-}
-</style>

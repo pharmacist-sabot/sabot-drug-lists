@@ -1,28 +1,23 @@
-<!-- src/views/HomeView.vue -->
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { Upload, Plus } from 'lucide-vue-next'
+import { Upload, Plus, LayoutDashboard } from 'lucide-vue-next'
 import { useDrugStore } from "../stores/drugs";
 import { useAuthStore } from "../stores/auth";
 import { useToastStore } from "../stores/toast";
 
-// Components
 import DrugTable from "../components/DrugTable.vue";
 import CsvUploadModal from "../components/CsvUploadModal.vue";
 import DrugFormModal from "../components/DrugFormModal.vue";
 import DecommissionModal from "../components/DecommissionModal.vue";
 
-// -- Stores --
 const drugStore = useDrugStore();
 const authStore = useAuthStore();
 const toastStore = useToastStore();
 
-// Destructure reactive state
 const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
 const { isAdmin } = storeToRefs(authStore);
 
-// -- Local UI State --
 const showCsvModal = ref(false);
 const showDrugFormModal = ref(false);
 const showDecommissionModal = ref(false);
@@ -30,29 +25,19 @@ const currentDrug = ref(null);
 const allCategories = ref([]);
 let searchTimeout;
 
-// -- Initialization --
 onMounted(async () => {
     drugStore.resetFilters();
     allCategories.value = await drugStore.fetchCategories();
     await drugStore.fetchDrugs('active');
 });
 
-// Watchers
-watch(
-    () => filters.value.searchTerm,
-    () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            drugStore.fetchDrugs('active');
-        }, 300);
-    },
-);
-
-watch(() => filters.value.category, () => {
-    drugStore.fetchDrugs('active');
+watch(() => filters.value.searchTerm, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => { drugStore.fetchDrugs('active'); }, 300);
 });
 
-// -- Handlers --
+watch(() => filters.value.category, () => { drugStore.fetchDrugs('active'); });
+
 function openAddDrugModal() {
     currentDrug.value = null;
     showDrugFormModal.value = true;
@@ -73,7 +58,7 @@ async function handleSaveDrug(drugData) {
     if (result.success) {
         showDrugFormModal.value = false;
         toastStore.addToast("บันทึกข้อมูลยาสำเร็จ", "success");
-        await drugStore.fetchDrugs('active'); // Refresh list
+        await drugStore.fetchDrugs('active');
         allCategories.value = await drugStore.fetchCategories();
     } else {
         toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
@@ -85,7 +70,7 @@ async function handleDecommission({ drug, remarks }) {
     if (result.success) {
         showDecommissionModal.value = false;
         toastStore.addToast(`นำยา "${drug.trade_name}" ออกจากบัญชีสำเร็จ`, "success");
-        await drugStore.fetchDrugs('active'); // Refresh list
+        await drugStore.fetchDrugs('active');
     } else {
         toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, "error");
     }
@@ -94,34 +79,41 @@ async function handleDecommission({ drug, remarks }) {
 async function onCsvSuccess() {
     await drugStore.fetchDrugs('active');
     allCategories.value = await drugStore.fetchCategories();
-    // Toast handled in Modal, or here if we prefer consistency
 }
 </script>
 
 <template>
-    <div class="page-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="header-content">
-                <h1 class="page-title">บัญชียาโรงพยาบาล</h1>
-                <p class="page-subtitle">จัดการรายการยาที่เปิดใช้งาน (Active List)</p>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-20">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div class="flex items-start gap-4">
+                <div
+                    class="hidden md:flex w-12 h-12 bg-white rounded-2xl items-center justify-center text-blue-600 shadow-sm border border-slate-100">
+                    <LayoutDashboard :size="24" />
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">รายการยาปัจจุบัน</h2>
+                    <p class="text-slate-500 text-sm mt-1">จัดการข้อมูลยา ราคายา และสถานะการใช้งาน</p>
+                </div>
             </div>
 
-            <!-- Actions (Admin Only) -->
-            <div class="header-actions" v-if="isAdmin">
-                <button class="btn btn-secondary" @click="showCsvModal = true">
-                    <Upload :size="18" />
-                    <span>นำเข้า CSV</span>
+            <div class="flex items-center gap-3 w-full md:w-auto" v-if="isAdmin">
+                <button
+                    class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+                    @click="showCsvModal = true">
+                    <Upload :size="16" />
+                    Import CSV
                 </button>
-                <button class="btn btn-primary" @click="openAddDrugModal">
+                <button
+                    class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 hover:shadow-slate-900/30 transition-all active:scale-95"
+                    @click="openAddDrugModal">
                     <Plus :size="18" />
-                    <span>เพิ่มรายการยา</span>
+                    เพิ่มรายการยา
                 </button>
             </div>
         </div>
 
-        <!-- Table Section -->
-        <!-- Note: We bind to store filters directly -->
+        <!-- Table -->
         <DrugTable :drugs="drugs" :loading="loading" :is-admin="isAdmin" :is-decommissioned-view="false"
             v-model:searchTerm="filters.searchTerm" v-model:filterCategory="filters.category"
             :available-categories="allCategories" :current-page="currentPage" :total-pages="totalPages"
@@ -130,92 +122,9 @@ async function onCsvSuccess() {
 
         <!-- Modals -->
         <CsvUploadModal :show="showCsvModal" @close="showCsvModal = false" @import-success="onCsvSuccess" />
-
         <DrugFormModal :show="showDrugFormModal" :drug="currentDrug" @close="showDrugFormModal = false"
             @save="handleSaveDrug" />
-
         <DecommissionModal v-if="currentDrug" :show="showDecommissionModal" :drug="currentDrug"
             @close="showDecommissionModal = false" @confirm="handleDecommission" />
     </div>
 </template>
-
-<style scoped>
-/* Container Layout */
-.page-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    animation: fadeIn 0.4s ease-out;
-}
-
-/* Header Styling */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding-bottom: 0.5rem;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.page-title {
-    font-size: var(--fs-h2);
-    font-weight: 700;
-    color: var(--c-text-primary);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-}
-
-.page-subtitle {
-    font-size: var(--fs-small);
-    color: var(--c-text-secondary);
-    font-weight: 500;
-}
-
-/* Action Buttons */
-.header-actions {
-    display: flex;
-    gap: 0.75rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.25rem;
-        margin-top: 0.5rem;
-    }
-
-    .header-actions {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .header-actions .btn {
-        width: 100%;
-        justify-content: center;
-        padding: 0.75rem;
-    }
-}
-
-/* Simple Fade In Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>
