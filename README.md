@@ -1,41 +1,51 @@
-# Hospital Drug Formulary Management System
+# Sabot Drug Lists (Hospital Drug Formulary Management System)
 
-A comprehensive web application for managing a hospital's drug formulary, built with Vue 3, Vite, and powered by a Supabase backend. This system provides an administrative interface for viewing, searching, adding, editing, and decommissioning drugs from the hospital's official list.
+![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)
+![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Pinia](https://img.shields.io/badge/pinia-%23ffd859.svg?style=for-the-badge&logo=pinia&logoColor=black)
+
+A modern, comprehensive **Progressive Web Application (PWA)** for managing a hospital's drug formulary. Built with **Vue 3**, **Vite**, and **Supabase**, this system streamlines the process of viewing, searching, adding, editing, and decommissioning drugs from the hospital's official list.
 
 ## ✨ Key Features
 
--   **Role-Based Access Control**: Differentiates between regular users (view-only) and administrators with full CRUD (Create, Read, Update, Delete) capabilities.
--   **Full Drug Lifecycle Management**:
-    -   Add new drugs to the formulary.
-    -   Edit existing drug information (e.g., name, category).
-    -   Decommission drugs with a required justification, moving them to a separate historical view.
-    -   Recommission drugs from the inactive list back to the active formulary.
--   **Powerful Data Handling**:
-    -   **Bulk CSV Import**: Admins can quickly populate or update the drug list by uploading a CSV file.
-    -   **Server-Side Pagination**: Efficiently handles large drug lists without performance degradation.
-    -   **Dynamic Search & Filtering**: Instantly search by drug code, trade name, or generic name, and filter by drug category.
--   **User-Friendly Interface**:
-    -   A clean, responsive, and modern UI with a dedicated navigation sidebar.
-    -   Separate views for active and decommissioned drugs.
-    -   Modals for all major actions (Add/Edit, Decommission, CSV Upload).
-    -   Real-time toast notifications for user feedback on actions (success, error, info).
--   **Supabase Integration**: Leverages Supabase for database, authentication, and role management.
+-   **📱 Progressive Web App (PWA)**: Fully installable on desktop and mobile devices with offline capabilities and auto-updates.
+-   **🔐 Role-Based Access Control**: Secure access with distinct roles for **Administrators** (full CRUD access) and **Viewers** (read-only).
+-   **💊 Full Drug Lifecycle Management**:
+    -   **Create**: Add new drugs to the formulary.
+    -   **Read**: Advanced search and filtering capabilities.
+    -   **Update**: Edit existing drug details.
+    -   **Decommission**: Move drugs to a historical archive with required justification.
+    -   **Recommission**: Restore drugs to the active list.
+-   **⚡ High Performance**:
+    -   **State Management**: Powered by [Pinia](https://pinia.vuejs.org/) for efficient and reactive data handling.
+    -   **Server-Side Pagination**: Optimized for handling large datasets without performance degradation.
+    -   **Instant Search**: Real-time filtering by drug code, trade name, generic name, or category.
+-   **🛠️ Powerful Admin Tools**:
+    -   **Bulk CSV Import**: Rapidly populate or update the database using CSV files.
+-   **🎨 Modern UI/UX**:
+    -   **Responsive Design**: Built with [Tailwind CSS](https://tailwindcss.com/) for a mobile-first experience.
+    -   **Clean Iconography**: Using [Lucide Vue](https://lucide.dev/) for consistent and beautiful icons.
+    -   **Interactive Feedback**: Real-time toast notifications for user actions.
 
 ## 🛠️ Technology Stack
 
--   **Frontend Framework**: [Vue 3](https://vuejs.org/) (using Composition API and `<script setup>`)
+-   **Frontend Framework**: [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`)
 -   **Build Tool**: [Vite](https://vitejs.dev/)
--   **Backend & Database**: [Supabase](https://supabase.io/)
--   **Routing**: [Vue Router](https://router.vuejs.org/)
+-   **State Management**: [Pinia](https://pinia.vuejs.org/)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/) (v4)
+-   **Backend & Auth**: [Supabase](https://supabase.io/)
+-   **PWA Support**: [Vite PWA Plugin](https://vite-pwa-org.netlify.app/)
+-   **Icons**: [Lucide Vue](https://lucide.dev/)
 -   **CSV Parsing**: [PapaParse](https://www.papaparse.com/)
--   **Styling**: Custom CSS with CSS Custom Properties 
 
 ## 🔌 Supabase Backend Setup
 
-This project is a frontend application and requires a Supabase project for its backend functionality. You will need to set up your own Supabase project with the following schema:
+This project requires a Supabase project for its backend. Ensure your project has the following schema:
 
-1.  **`drugs` Table**: A table to store drug information. Essential columns include:
-    -   `id` (uuid, primary key)
+1.  **`drugs` Table**:
+    -   `id` (uuid, PK)
     -   `drug_code` (text)
     -   `trade_name` (text)
     -   `generic_name` (text)
@@ -43,88 +53,83 @@ This project is a frontend application and requires a Supabase project for its b
     -   `price_opd` (numeric)
     -   `category` (text)
     -   `is_active` (boolean, default: `true`)
-    -   `remarks` (text, for decommission reason)
+    -   `remarks` (text)
     -   `decommissioned_at` (timestamp)
 
-2.  **`profiles_drugcupsabot` Table**: A table linked to Supabase Auth users to manage roles.
-    -   `id` (uuid, foreign key to `auth.users.id`)
-    -   `role` (text, e.g., 'admin' or 'viewer')
+2.  **`profiles_drugcupsabot` Table**:
+    -   `id` (uuid, FK to `auth.users.id`)
+    -   `role` (text: `'admin'` or `'viewer'`)
 
-3.  **Authentication**: Enable Email/Password authentication in your Supabase project.
-
-4.  **Database Functions (Optional but Recommended)**: The project uses an RPC function `get_unique_categories` to populate the category filter. You can create this in the Supabase SQL Editor.
+3.  **Authentication**: Enable Email/Password authentication.
 
 ## 🚀 Getting Started
-
-Follow these instructions to get the project running on your local machine.
 
 ### Prerequisites
 
 -   [Node.js](https://nodejs.org/) (v18.x or newer)
--   [npm](https://www.npmjs.com/) or another package manager
--   A Supabase project (see section above)
+-   npm or yarn
 
-### Installation & Local Development
+### Installation
 
-1.  **Clone the repository:**
+1.  **Clone the repository**
     ```bash
     git clone https://github.com/pharmacist-sabot/sabot-drug-lists.git
-    ```
-
-2.  **Navigate to the project directory:**
-    ```bash
     cd sabot-drug-lists
     ```
 
-3.  **Install dependencies:**
+2.  **Install dependencies**
     ```bash
     npm install
     ```
 
-4.  **Set up environment variables:**
-    Create a `.env` file in the root of the project by copying the example:
+3.  **Configure Environment**
+    Create a `.env` file in the root directory:
     ```bash
     cp .env
     ```
-    Then, fill in the `.env` file with your Supabase Project URL and Anon Key, which can be found in your Supabase project's API settings.
-
+    Update the `.env` file with your Supabase credentials:
     ```env
-    # .env
     VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
     VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
     ```
 
-5.  **Run the development server:**
+4.  **Run Development Server**
     ```bash
     npm run dev
     ```
-    The application will be available at `http://localhost:5173` (or the port shown in your terminal).
+    The app will be available at `http://localhost:5173`.
 
-## 📦 Building for Production
+### Building for Production
 
-To create a production-ready build of the application:
+To create a production-ready build:
 
 ```bash
 npm run build
 ```
 
-The compiled assets will be located in the `dist/` directory, ready for deployment to any static hosting service.
+The artifacts will be in the `dist/` directory.
 
 ## 📁 Project Structure
 
 ```
-.
-├── public/               # Static assets
-├── src/
-│   ├── assets/           # Global CSS
-│   ├── components/       # Reusable Vue components (Table, Modals, Navbar, etc.)
-│   ├── router/           # Vue Router configuration
-│   ├── views/            # Page-level components (HomeView, DecommissionedView)
-│   ├── App.vue           # Root Vue component with layout and auth logic
-│   ├── main.js           # Application entry point
-│   └── supabaseClient.js # Supabase client initialization
-├── .env                  # Environment variable template
-├── index.html            # Main HTML file
-├── package.json          # Project dependencies and scripts
-└── vite.config.js        # Vite configuration
+src/
+├── assets/          # Global styles (Tailwind) and static assets
+├── components/      # Reusable Vue components (UI elements, Modals)
+├── router/          # Vue Router configuration
+├── services/        # API calls and external service logic
+├── stores/          # Pinia state stores
+├── views/           # Page-level components
+├── App.vue          # Root component
+├── main.js          # Application entry point
+└── supabaseClient.js # Supabase client configuration
 ```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
