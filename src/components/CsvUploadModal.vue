@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import Papa from 'papaparse'
-import { supabase } from '../supabaseClient'
+import { useDrugStore } from '../stores/drugs'
 import { useToastStore } from '../stores/toast'
 import { X, FileSpreadsheet, UploadCloud } from 'lucide-vue-next'
 
@@ -11,6 +11,7 @@ const emit = defineEmits(['close', 'import-success'])
 const file = ref(null)
 const isLoading = ref(false)
 const toastStore = useToastStore()
+const drugStore = useDrugStore()
 
 function handleFileChange(event) {
     file.value = event.target.files[0]
@@ -45,13 +46,11 @@ function processImport() {
                 return;
             }
 
-            const { error } = await supabase.from('drugs').upsert(drugsToInsert, {
-                onConflict: 'drug_code'
-            })
+            const result = await drugStore.importDrugs(drugsToInsert)
 
             isLoading.value = false
-            if (error) {
-                toastStore.addToast(`เกิดข้อผิดพลาด: ${error.message}`, 'error')
+            if (!result.success) {
+                toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error')
             } else {
                 toastStore.addToast(`นำเข้าข้อมูล ${drugsToInsert.length} รายการสำเร็จ!`, 'success')
                 emit('import-success')

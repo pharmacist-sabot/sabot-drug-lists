@@ -1,3 +1,4 @@
+// src/stores/auth.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '../supabaseClient'
@@ -57,11 +58,23 @@ export const useAuthStore = defineStore('auth', () => {
     return data
   }
 
+  /**
+   * Production-Grade Fail-safe Logout
+   * Ensures client state is cleared even if server returns 401/403
+   */
   async function logout() {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    user.value = null
-    isAdmin.value = false
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.warn('Logout warning (Supabase):', error.message)
+      }
+    } catch (err) {
+      console.error('Logout Exception:', err)
+    } finally {
+      // Always clear user state on client side
+      user.value = null
+      isAdmin.value = false
+    }
   }
 
   return {
