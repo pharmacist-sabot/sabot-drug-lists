@@ -24,7 +24,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = `${to.meta.title} | DrugList` || 'DrugList';
+  // ใช้ Ternary Operator ( ? : ) เช็คเงื่อนไขให้ชัดเจน
+  document.title = to.meta.title ? `${to.meta.title} | DrugList` : 'DrugList';
+
   next();
 });
 
