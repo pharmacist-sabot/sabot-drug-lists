@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-3 w-full md:w-auto" v-if="isAdmin">
+      <div v-if="isAdmin" class="flex items-center gap-3 w-full md:w-auto">
         <button
           class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
           @click="showCsvModal = true"
@@ -128,12 +128,12 @@
 
     <!-- Table -->
     <DrugTable
+      v-model:search-term="filters.searchTerm"
+      v-model:filter-category="filters.category"
       :drugs="drugs"
       :loading="loading"
       :is-admin="isAdmin"
       :is-decommissioned-view="false"
-      v-model:searchTerm="filters.searchTerm"
-      v-model:filterCategory="filters.category"
       :available-categories="allCategories"
       :current-page="currentPage"
       :total-pages="totalPages"

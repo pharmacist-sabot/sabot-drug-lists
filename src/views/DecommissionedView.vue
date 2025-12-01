@@ -5,7 +5,7 @@
   import { useAuthStore } from '../stores/auth';
   import { useToastStore } from '../stores/toast';
   import DrugTable from '../components/DrugTable.vue';
-  import { ArchiveRestore, History } from 'lucide-vue-next';
+  import { History } from 'lucide-vue-next';
 
   const drugStore = useDrugStore();
   const authStore = useAuthStore();
@@ -61,11 +61,11 @@
 
     <!-- Table -->
     <DrugTable
+      v-model:search-term="filters.searchTerm"
       :drugs="drugs"
       :loading="loading"
       :is-admin="isAdmin"
       :is-decommissioned-view="true"
-      v-model:searchTerm="filters.searchTerm"
       :current-page="currentPage"
       :total-pages="totalPages"
       :total-count="totalCount"
