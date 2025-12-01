@@ -104,7 +104,7 @@
 
           <!-- Actions Right -->
           <div class="flex items-center gap-6 sm:justify-end pl-14 sm:pl-0">
-            <div class="text-right hidden sm:block min-w-[80px]">
+            <div class="text-right hidden sm:block min-w-20">
               <div class="text-sm font-semibold text-slate-900">
                 ฿{{ (drug.price_opd || 0).toFixed(2) }}
               </div>
@@ -181,20 +181,50 @@
     Pill,
   } from 'lucide-vue-next';
 
-  const props = defineProps({
-    drugs: Array,
-    loading: Boolean,
-    isAdmin: Boolean,
-    isDecommissionedView: { type: Boolean, default: false },
-    searchTerm: String,
-    filterCategory: String,
-    availableCategories: Array,
-    currentPage: Number,
-    totalPages: Number,
-    totalCount: Number,
+  defineProps({
+    drugs: {
+      type: Array,
+      default: () => [], // Array ต้องใช้ Arrow Function คืนค่า
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    isDecommissionedView: {
+      type: Boolean,
+      default: false,
+    },
+    searchTerm: {
+      type: String,
+      default: '',
+    },
+    filterCategory: {
+      type: String,
+      default: 'all',
+    },
+    availableCategories: {
+      type: Array,
+      default: () => [],
+    },
+    currentPage: {
+      type: Number,
+      default: 1,
+    },
+    totalPages: {
+      type: Number,
+      default: 1,
+    },
+    totalCount: {
+      type: Number,
+      default: 0,
+    },
   });
 
-  const emit = defineEmits([
+  defineEmits([
     'edit',
     'trigger-decommission',
     'recommission',
