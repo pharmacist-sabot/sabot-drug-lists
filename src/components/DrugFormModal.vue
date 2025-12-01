@@ -127,7 +127,16 @@
   import { ref, watch, computed } from 'vue';
   import { X } from 'lucide-vue-next';
 
-  const props = defineProps({ show: Boolean, drug: Object });
+  const props = defineProps({
+    show: {
+      type: Boolean,
+      default: false,
+    },
+    drug: {
+      type: Object,
+      default: null,
+    },
+  });
   const emit = defineEmits(['close', 'save']);
   const form = ref({});
   const isEditMode = computed(() => !!props.drug?.id);
