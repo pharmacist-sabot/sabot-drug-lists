@@ -53,7 +53,7 @@ export const useDrugStore = defineStore('drugs', () => {
   async function fetchCategories() {
     try {
       return await drugService.getCategories();
-    } catch (err) {
+    } catch {
       // กรณีดึงหมวดหมู่ไม่ได้ ให้คืนค่าว่างเพื่อให้แอปทำงานต่อได้
       return [];
     }
