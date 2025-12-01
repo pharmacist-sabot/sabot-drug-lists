@@ -43,20 +43,20 @@
   <div class="min-h-screen flex flex-col bg-[#FDFDFD] font-sans text-slate-900">
     <Navbar
       :user="user"
-      :isAdmin="isAdmin"
-      :mobileMenuOpen="mobileMenuOpen"
+      :is-admin="isAdmin"
+      :mobile-menu-open="mobileMenuOpen"
       @login="showLoginModal = true"
       @logout="onLogoutClick"
       @toggle-mobile-menu="toggleMobileMenu"
     />
 
-    <main class="flex-grow w-full">
+    <main class="grow w-full">
       <router-view />
     </main>
 
     <!-- Global Toast Container -->
     <div
-      class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none p-4 sm:p-0"
+      class="fixed bottom-6 right-6 z-9999 flex flex-col gap-3 max-w-sm w-full pointer-events-none p-4 sm:p-0"
     >
       <TransitionGroup name="toast-slide">
         <Toast

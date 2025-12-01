@@ -14,15 +14,15 @@
         >
           <h3 class="font-semibold text-slate-900 text-lg">ยืนยันการนำออก</h3>
           <button
-            @click="$emit('close')"
             class="p-2 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+            @click="$emit('close')"
           >
             <X :size="20" />
           </button>
         </div>
 
         <div class="p-6">
-          <form @submit.prevent="handleConfirm" class="space-y-5">
+          <form class="space-y-5" @submit.prevent="handleConfirm">
             <div
               class="bg-amber-50 text-amber-800 p-4 rounded-xl flex gap-3 items-start border border-amber-100"
             >
@@ -49,8 +49,8 @@
             <div class="pt-2 flex justify-end gap-3">
               <button
                 type="button"
-                @click="$emit('close')"
                 class="px-5 py-2.5 rounded-xl font-medium text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all"
+                @click="$emit('close')"
               >
                 ยกเลิก
               </button>

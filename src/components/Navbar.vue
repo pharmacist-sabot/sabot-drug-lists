@@ -7,7 +7,7 @@
       <div class="flex items-center gap-3">
         <router-link to="/" class="flex items-center gap-3 group">
           <div
-            class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/40 transition-all"
+            class="w-8 h-8 bg-linear-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/40 transition-all"
           >
             <Pill :size="18" />
           </div>
@@ -23,29 +23,29 @@
       <!-- Desktop Nav -->
       <div class="hidden md:flex items-center gap-6">
         <nav class="flex items-center gap-1 bg-slate-100/50 p-1 rounded-xl">
-          <router-link to="/" custom v-slot="{ navigate, isActive }">
+          <router-link v-slot="{ navigate, isActive }" to="/" custom>
             <button
-              @click="navigate"
               :class="[
                 'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
                 isActive
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700',
               ]"
+              @click="navigate"
             >
               <FileSpreadsheet :size="16" />
               บัญชียา
             </button>
           </router-link>
-          <router-link to="/decommissioned" custom v-slot="{ navigate, isActive }">
+          <router-link v-slot="{ navigate, isActive }" to="/decommissioned" custom>
             <button
-              @click="navigate"
               :class="[
                 'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
                 isActive
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700',
               ]"
+              @click="navigate"
             >
               <ArchiveRestore :size="16" />
               ประวัติการยกเลิก
@@ -69,14 +69,14 @@
             :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)"
             alt="User"
             class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm cursor-pointer hover:ring-blue-100 transition-all"
-            @click="$emit('logout')"
             title="คลิกเพื่อออกจากระบบ"
+            @click="$emit('logout')"
           />
         </div>
         <button
           v-else
-          @click="$emit('login')"
           class="bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 hover:shadow-slate-900/30 px-5 py-2 rounded-xl text-sm font-medium transition-all"
+          @click="$emit('login')"
         >
           เข้าสู่ระบบ
         </button>
@@ -136,19 +136,19 @@
               </div>
             </div>
             <button
-              @click="$emit('logout')"
               class="w-full bg-slate-100 text-slate-700 py-2 rounded-lg text-sm font-medium hover:bg-red-50 hover:text-red-600 transition-colors"
+              @click="$emit('logout')"
             >
               ออกจากระบบ
             </button>
           </div>
           <div v-else class="px-4 pb-2">
             <button
+              class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-medium shadow-lg shadow-slate-900/20"
               @click="
                 $emit('login');
                 $emit('toggle-mobile-menu');
               "
-              class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-medium shadow-lg shadow-slate-900/20"
             >
               เข้าสู่ระบบ
             </button>

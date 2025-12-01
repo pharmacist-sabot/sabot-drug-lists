@@ -44,8 +44,8 @@
       >
         <div class="absolute top-4 right-4">
           <button
-            @click="$emit('close')"
             class="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+            @click="$emit('close')"
           >
             <X :size="20" />
           </button>
@@ -62,7 +62,7 @@
         </div>
 
         <div class="px-8 pb-8">
-          <form @submit.prevent="handleSubmit" class="space-y-4">
+          <form class="space-y-4" @submit.prevent="handleSubmit">
             <div class="space-y-1.5">
               <label class="text-sm font-semibold text-slate-700">อีเมล</label>
               <input

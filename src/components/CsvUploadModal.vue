@@ -84,8 +84,8 @@
         >
           <h3 class="font-semibold text-slate-900 text-lg">นำเข้าไฟล์ CSV</h3>
           <button
-            @click="$emit('close')"
             class="p-2 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+            @click="$emit('close')"
           >
             <X :size="20" />
           </button>
@@ -104,11 +104,11 @@
               <span class="block font-semibold text-slate-700">เลือกไฟล์ .csv</span>
               <span class="text-sm text-slate-400">คลิกเพื่อเลือกไฟล์จากเครื่องของคุณ</span>
               <input
-                type="file"
                 id="csv-file"
-                @change="handleFileChange"
+                type="file"
                 accept=".csv"
                 class="hidden"
+                @change="handleFileChange"
               />
             </label>
             <div
@@ -133,15 +133,15 @@
           <div class="flex justify-end gap-3">
             <button
               class="px-5 py-2.5 rounded-xl font-medium text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all"
-              @click="$emit('close')"
               :disabled="isLoading"
+              @click="$emit('close')"
             >
               ยกเลิก
             </button>
             <button
               class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 flex items-center gap-2"
-              @click="processImport"
               :disabled="isLoading"
+              @click="processImport"
             >
               <UploadCloud :size="16" />
               {{ isLoading ? 'กำลังประมวลผล...' : 'เริ่มนำเข้า' }}

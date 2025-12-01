@@ -8,11 +8,11 @@
           @update:model-value="$emit('update:searchTerm', $event)"
         />
       </div>
-      <div class="sm:w-48" v-if="!isDecommissionedView">
+      <div v-if="!isDecommissionedView" class="sm:w-48">
         <select
           :value="filterCategory"
-          @change="$emit('update:filterCategory', $event.target.value)"
           class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm appearance-none cursor-pointer"
+          @change="$emit('update:filterCategory', $event.target.value)"
         >
           <option value="all">ทุกหมวดหมู่</option>
           <option v-for="cat in availableCategories" :key="cat" :value="cat">
@@ -115,23 +115,23 @@
             <div v-if="isAdmin" class="flex items-center gap-2 transition-opacity">
               <template v-if="!isDecommissionedView">
                 <button
-                  @click="$emit('edit', drug)"
                   class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 text-sm font-medium transition-all"
+                  @click="$emit('edit', drug)"
                 >
                   แก้ไข
                 </button>
                 <button
-                  @click="$emit('trigger-decommission', drug)"
                   class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   title="นำออกจากบัญชี"
+                  @click="$emit('trigger-decommission', drug)"
                 >
                   <Archive :size="18" />
                 </button>
               </template>
               <template v-else>
                 <button
-                  @click="$emit('recommission', drug)"
                   class="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 text-sm font-medium transition-all"
+                  @click="$emit('recommission', drug)"
                 >
                   <RotateCcw :size="16" />
                   นำกลับเข้าบัญชี
@@ -151,16 +151,16 @@
       <p>หน้า {{ currentPage }} จาก {{ totalPages }} (รวม {{ totalCount }} รายการ)</p>
       <div class="flex gap-2">
         <button
-          @click="$emit('change-page', currentPage - 1)"
           :disabled="currentPage === 1"
           class="p-2 border border-slate-200 rounded-lg hover:bg-white bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          @click="$emit('change-page', currentPage - 1)"
         >
           <ChevronLeft :size="16" />
         </button>
         <button
-          @click="$emit('change-page', currentPage + 1)"
           :disabled="currentPage >= totalPages"
           class="p-2 border border-slate-200 rounded-lg hover:bg-white bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          @click="$emit('change-page', currentPage + 1)"
         >
           <ChevronRight :size="16" />
         </button>
