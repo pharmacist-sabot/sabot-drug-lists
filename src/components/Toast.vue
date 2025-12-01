@@ -15,7 +15,10 @@
   import { CheckCircle2, AlertCircle, Info } from 'lucide-vue-next';
 
   const props = defineProps({
-    message: String,
+    message: {
+      type: String,
+      default: '',
+    },
     type: {
       type: String,
       default: 'info',
