@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 supports-[backdrop-filter]:bg-white/60 transition-all duration-300"
+    class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 supports-backdrop-filter:bg-white/60 transition-all duration-300"
   >
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <!-- Brand -->
@@ -162,16 +162,23 @@
 <script setup>
   import { watch, onUnmounted } from 'vue';
   import { Pill, ArchiveRestore, Menu, X, FileSpreadsheet } from 'lucide-vue-next';
-  import { useRoute } from 'vue-router';
 
   const props = defineProps({
-    user: Object,
-    mobileMenuOpen: Boolean,
-    isAdmin: Boolean,
+    user: {
+      type: Object,
+      default: null,
+    },
+    mobileMenuOpen: {
+      type: Boolean,
+      default: false,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   defineEmits(['login', 'logout', 'toggle-mobile-menu']);
-  const route = useRoute();
 
   const getAvatarUrl = (email) => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=0f172a&color=fff&bold=true`;
