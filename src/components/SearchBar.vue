@@ -1,7 +1,13 @@
 <script setup>
   import { Search } from 'lucide-vue-next';
 
-  defineProps(['modelValue']);
+  defineProps({
+    modelValue: {
+      type: String,
+      default: '', // กำหนดค่าเริ่มต้นเป็น string ว่าง กัน error
+    },
+  });
+
   defineEmits(['update:modelValue']);
 </script>
 
