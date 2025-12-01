@@ -2,43 +2,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap');
 
 /* Import Tailwind v4 */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Theme Configuration using CSS Variables */
 @theme {
-    /* กำหนด Font ให้ตรงกับ Design */
-    --font-sans: 'Sarabun', 'Inter', sans-serif;
+  /* กำหนด Font ให้ตรงกับ Design */
+  --font-sans: 'Sarabun', 'Inter', sans-serif;
 
-    /* สี Slate มีให้ใช้อยู่แล้วใน v4 แต่ถ้าต้องการ Override เฉพาะเฉดสีก็ทำได้ที่นี่ */
-    /* --color-slate-50: #f8fafc; */
+  /* สี Slate มีให้ใช้อยู่แล้วใน v4 แต่ถ้าต้องการ Override เฉพาะเฉดสีก็ทำได้ที่นี่ */
+  /* --color-slate-50: #f8fafc; */
 }
 
 /* Base Styles */
 body {
-    background-color: #FDFDFD;
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  background-color: #fdfdfd;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom Transitions for Modals (Glassmorphism effects) */
 .modal-enter-active,
 .modal-leave-active {
-    transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .modal-enter-from,
 .modal-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 
 .modal-enter-active .modal-panel,
 .modal-leave-active .modal-panel {
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .modal-enter-from .modal-panel,
 .modal-leave-to .modal-panel {
-    opacity: 0;
-    transform: scale(0.95);
+  opacity: 0;
+  transform: scale(0.95);
 }

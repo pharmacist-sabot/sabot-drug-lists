@@ -1,31 +1,31 @@
 // src/router/index.js
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: HomeView,
-    meta: { title: 'บัญชียาโรงพยาบาล' }
+    meta: { title: 'บัญชียาโรงพยาบาล' },
   },
   {
     path: '/decommissioned',
     name: 'Decommissioned',
 
     component: () => import('../views/DecommissionedView.vue'),
-    meta: { title: 'ยาที่นำออกจากบัญชี' }
-  }
-]
+    meta: { title: 'ยาที่นำออกจากบัญชี' },
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
 router.beforeEach((to, from, next) => {
-  document.title = `${to.meta.title} | DrugList` || 'DrugList'
-  next()
-})
+  document.title = `${to.meta.title} | DrugList` || 'DrugList';
+  next();
+});
 
-export default router
+export default router;
