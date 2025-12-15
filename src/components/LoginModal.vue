@@ -1,34 +1,37 @@
-<script setup>
-  import { ref } from 'vue';
-  import { LogIn, AlertCircle, X } from 'lucide-vue-next';
-  import { useAuthStore } from '../stores/auth';
-  import { useToastStore } from '../stores/toast';
+<script setup lang="ts">
+import { AlertCircle, LogIn, X } from 'lucide-vue-next';
+import { ref } from 'vue';
 
-  defineProps({ show: Boolean });
-  const emit = defineEmits(['close']);
+import { useAuthStore } from '../stores/auth';
+import { useToastStore } from '../stores/toast';
 
-  const authStore = useAuthStore();
-  const toastStore = useToastStore();
-  const email = ref('');
-  const password = ref('');
-  const errorMsg = ref('');
-  const isLoading = ref(false);
+defineProps({ show: Boolean });
+const emit = defineEmits(['close']);
 
-  async function handleSubmit() {
-    errorMsg.value = '';
-    isLoading.value = true;
-    try {
-      await authStore.login(email.value, password.value);
-      email.value = '';
-      password.value = '';
-      toastStore.addToast('เข้าสู่ระบบสำเร็จ', 'success');
-      emit('close');
-    } catch (err) {
-      errorMsg.value = err.message || 'Email หรือรหัสผ่านไม่ถูกต้อง';
-    } finally {
-      isLoading.value = false;
-    }
+const authStore = useAuthStore();
+const toastStore = useToastStore();
+const email = ref('');
+const password = ref('');
+const errorMsg = ref('');
+const isLoading = ref(false);
+
+async function handleSubmit() {
+  errorMsg.value = '';
+  isLoading.value = true;
+  try {
+    await authStore.login(email.value, password.value);
+    email.value = '';
+    password.value = '';
+    toastStore.addToast('เข้าสู่ระบบสำเร็จ', 'success');
+    emit('close');
   }
+  catch (err) {
+    errorMsg.value = err.message || 'Email หรือรหัสผ่านไม่ถูกต้อง';
+  }
+  finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -37,7 +40,7 @@
       <div
         class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
         @click="$emit('close')"
-      ></div>
+      />
 
       <div
         class="modal-panel relative bg-white w-full max-w-md rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden transform border border-slate-100"
@@ -57,8 +60,12 @@
           >
             <LogIn :size="32" />
           </div>
-          <h2 class="text-2xl font-bold text-slate-900">ยินดีต้อนรับกลับ</h2>
-          <p class="text-slate-500 mt-2">เข้าสู่ระบบเพื่อจัดการบัญชียา</p>
+          <h2 class="text-2xl font-bold text-slate-900">
+            ยินดีต้อนรับกลับ
+          </h2>
+          <p class="text-slate-500 mt-2">
+            เข้าสู่ระบบเพื่อจัดการบัญชียา
+          </p>
         </div>
 
         <div class="px-8 pb-8">
@@ -71,7 +78,7 @@
                 class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 placeholder="your@email.com"
                 required
-              />
+              >
             </div>
 
             <div class="space-y-1.5">
@@ -82,7 +89,7 @@
                 class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 placeholder="••••••••"
                 required
-              />
+              >
             </div>
 
             <div

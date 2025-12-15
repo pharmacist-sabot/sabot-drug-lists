@@ -1,6 +1,7 @@
 // src/stores/drugs.js
 import { defineStore } from 'pinia';
-import { ref, computed, reactive, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
+
 import { drugService } from '../services/drugService';
 
 export const useDrugStore = defineStore('drugs', () => {
@@ -36,16 +37,18 @@ export const useDrugStore = defineStore('drugs', () => {
       const { data, count } = await drugService.getDrugs({
         page: currentPage.value,
         pageSize: pageSize.value,
-        status: status,
+        status,
         category: filters.category,
         searchTerm: filters.searchTerm,
       });
 
       drugs.value = data;
       totalCount.value = count || 0;
-    } catch (err) {
+    }
+    catch (err) {
       error.value = err.message;
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -53,7 +56,8 @@ export const useDrugStore = defineStore('drugs', () => {
   async function fetchCategories() {
     try {
       return await drugService.getCategories();
-    } catch {
+    }
+    catch {
       // กรณีดึงหมวดหมู่ไม่ได้ ให้คืนค่าว่างเพื่อให้แอปทำงานต่อได้
       return [];
     }
@@ -64,9 +68,11 @@ export const useDrugStore = defineStore('drugs', () => {
     try {
       await drugService.upsertDrugs(drugData);
       return { success: true };
-    } catch (err) {
+    }
+    catch (err) {
       return { success: false, message: err.message };
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -77,9 +83,11 @@ export const useDrugStore = defineStore('drugs', () => {
     try {
       await drugService.upsertDrugs(drugList);
       return { success: true };
-    } catch (err) {
+    }
+    catch (err) {
       return { success: false, message: err.message };
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -89,9 +97,11 @@ export const useDrugStore = defineStore('drugs', () => {
     try {
       await drugService.updateStatus(drug.id, { isActive: false, remarks });
       return { success: true };
-    } catch (err) {
+    }
+    catch (err) {
       return { success: false, message: err.message };
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -101,9 +111,11 @@ export const useDrugStore = defineStore('drugs', () => {
     try {
       await drugService.updateStatus(drug.id, { isActive: true });
       return { success: true };
-    } catch (err) {
+    }
+    catch (err) {
       return { success: false, message: err.message };
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }

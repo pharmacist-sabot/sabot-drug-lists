@@ -1,14 +1,18 @@
-<script setup>
-  import { Search } from 'lucide-vue-next';
+<script setup lang="ts">
+import { Search } from 'lucide-vue-next';
 
-  defineProps({
-    modelValue: {
-      type: String,
-      default: '', // กำหนดค่าเริ่มต้นเป็น string ว่าง กัน error
-    },
-  });
+withDefaults(
+  defineProps<{
+    modelValue?: string;
+  }>(),
+  {
+    modelValue: '',
+  },
+);
 
-  defineEmits(['update:modelValue']);
+defineEmits<{
+  (e: 'update:modelValue', value: string): void;
+}>();
 </script>
 
 <template>
@@ -19,7 +23,7 @@
       :value="modelValue"
       placeholder="ค้นหาชื่อยา, รหัสเวชภัณฑ์, Generic name..."
       class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
-      @input="$emit('update:modelValue', $event.target.value)"
-    />
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+    >
   </div>
 </template>

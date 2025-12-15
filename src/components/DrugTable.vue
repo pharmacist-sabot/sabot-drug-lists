@@ -1,3 +1,66 @@
+<script setup lang="ts">
+import {
+  Archive,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Pill,
+  RotateCcw,
+  SearchX,
+} from 'lucide-vue-next';
+
+import type { Drug } from '@/types/database.types';
+
+import SearchBar from './SearchBar.vue';
+
+withDefaults(
+  defineProps<{
+    drugs?: Drug[];
+    loading?: boolean;
+    isAdmin?: boolean;
+    isDecommissionedView?: boolean;
+    searchTerm?: string;
+    filterCategory?: string;
+    availableCategories?: string[];
+    currentPage?: number;
+    totalPages?: number;
+    totalCount?: number;
+  }>(),
+  {
+    drugs: () => [],
+    loading: false,
+    isAdmin: false,
+    isDecommissionedView: false,
+    searchTerm: '',
+    filterCategory: 'all',
+    availableCategories: () => [],
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+  },
+);
+
+defineEmits<{
+  (e: 'edit', drug: Drug): void;
+  (e: 'trigger-decommission', drug: Drug): void;
+  (e: 'recommission', drug: Drug): void;
+  (e: 'update:searchTerm', value: string): void;
+  (e: 'update:filterCategory', value: string): void;
+  (e: 'change-page', page: number): void;
+}>();
+
+function formatDate(dateString: string | null) {
+  if (!dateString)
+    return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('th-TH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+</script>
+
 <template>
   <div class="flex flex-col gap-6">
     <!-- Controls & Filters -->
@@ -12,9 +75,11 @@
         <select
           :value="filterCategory"
           class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm appearance-none cursor-pointer"
-          @change="$emit('update:filterCategory', $event.target.value)"
+          @change="$emit('update:filterCategory', ($event.target as HTMLSelectElement).value)"
         >
-          <option value="all">ทุกหมวดหมู่</option>
+          <option value="all">
+            ทุกหมวดหมู่
+          </option>
           <option v-for="cat in availableCategories" :key="cat" :value="cat">
             {{ cat }}
           </option>
@@ -43,8 +108,12 @@
         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
           <SearchX :size="32" class="opacity-50" />
         </div>
-        <p class="text-lg font-medium text-slate-600">ไม่พบข้อมูลยา</p>
-        <p class="text-sm">ลองปรับคำค้นหาหรือตัวกรองใหม่อีกครั้ง</p>
+        <p class="text-lg font-medium text-slate-600">
+          ไม่พบข้อมูลยา
+        </p>
+        <p class="text-sm">
+          ลองปรับคำค้นหาหรือตัวกรองใหม่อีกครั้ง
+        </p>
       </div>
 
       <!-- List Data -->
@@ -57,8 +126,7 @@
           <!-- Drug Info Left -->
           <div class="flex items-start gap-4">
             <div
-              :class="[
-                'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1',
+              class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1" :class="[
                 drug.is_active ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-500',
               ]"
             >
@@ -108,7 +176,9 @@
               <div class="text-sm font-semibold text-slate-900">
                 ฿{{ (drug.price_opd || 0).toFixed(2) }}
               </div>
-              <div class="text-xs text-slate-400">ราคา OPD</div>
+              <div class="text-xs text-slate-400">
+                ราคา OPD
+              </div>
             </div>
 
             <!-- Admin Actions -->
@@ -168,78 +238,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-  import SearchBar from './SearchBar.vue';
-  import {
-    Archive,
-    RotateCcw,
-    Loader2,
-    SearchX,
-    ChevronLeft,
-    ChevronRight,
-    Pill,
-  } from 'lucide-vue-next';
-
-  defineProps({
-    drugs: {
-      type: Array,
-      default: () => [], // Array ต้องใช้ Arrow Function คืนค่า
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
-    isDecommissionedView: {
-      type: Boolean,
-      default: false,
-    },
-    searchTerm: {
-      type: String,
-      default: '',
-    },
-    filterCategory: {
-      type: String,
-      default: 'all',
-    },
-    availableCategories: {
-      type: Array,
-      default: () => [],
-    },
-    currentPage: {
-      type: Number,
-      default: 1,
-    },
-    totalPages: {
-      type: Number,
-      default: 1,
-    },
-    totalCount: {
-      type: Number,
-      default: 0,
-    },
-  });
-
-  defineEmits([
-    'edit',
-    'trigger-decommission',
-    'recommission',
-    'update:searchTerm',
-    'update:filterCategory',
-    'change-page',
-  ]);
-
-  function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('th-TH', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }
-</script>

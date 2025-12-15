@@ -1,8 +1,10 @@
-// src/router/index.js
+import type { RouteRecordRaw } from 'vue-router';
+
 import { createRouter, createWebHistory } from 'vue-router';
+
 import HomeView from '../views/HomeView.vue';
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
@@ -12,7 +14,6 @@ const routes = [
   {
     path: '/decommissioned',
     name: 'Decommissioned',
-
     component: () => import('../views/DecommissionedView.vue'),
     meta: { title: 'ยาที่นำออกจากบัญชี' },
   },
@@ -23,10 +24,8 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  // ใช้ Ternary Operator ( ? : ) เช็คเงื่อนไขให้ชัดเจน
-  document.title = to.meta.title ? `${to.meta.title} | DrugList` : 'DrugList';
-
+router.beforeEach((to, _from, next) => {
+  document.title = (to.meta.title as string) ? `${to.meta.title} | DrugList` : 'DrugList';
   next();
 });
 

@@ -13,7 +13,7 @@ export const useToastStore = defineStore('toast', () => {
   }
 
   function removeToast(id) {
-    toasts.value = toasts.value.filter((t) => t.id !== id);
+    toasts.value = toasts.value.filter(t => t.id !== id);
   }
 
   return { toasts, addToast, removeToast };

@@ -1,16 +1,16 @@
 {
   "name": "sabot-drug-lists",
-  "private": true,
-  "version": "0.1.0",
   "type": "module",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "prepare": "husky",
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.56.1",
@@ -23,17 +23,25 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@antfu/eslint-config": "^6.7.1",
+    "@tsconfig/node22": "^22.0.5",
+    "@types/node": "^25.0.2",
+    "@types/papaparse": "^5.5.2",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^6.0.1",
-    "@vue/eslint-config-prettier": "^10.2.0",
-    "@vue/eslint-config-typescript": "^14.6.0",
-    "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-vue": "^10.6.2",
-    "globals": "^16.5.0",
-    "prettier": "^3.7.3",
-    "typescript-eslint": "^8.48.0",
+    "@vue/tsconfig": "^0.8.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-format": "^1.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "typescript": "^5.9.3",
     "vite": "^7.1.2",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vue-tsc": "^3.1.8"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,vue,md,json,mjs,cjs}": [
+      "eslint --fix"
+    ]
   }
 }

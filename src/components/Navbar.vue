@@ -1,3 +1,44 @@
+<script setup lang="ts">
+import type { User } from '@supabase/supabase-js';
+
+import { ArchiveRestore, FileSpreadsheet, Menu, Pill, X } from 'lucide-vue-next';
+import { onUnmounted, watch } from 'vue';
+
+const props = withDefaults(
+  defineProps<{
+    user?: User | null;
+    mobileMenuOpen?: boolean;
+    isAdmin?: boolean;
+  }>(),
+  {
+    user: null,
+    mobileMenuOpen: false,
+    isAdmin: false,
+  },
+);
+
+defineEmits<{
+  (e: 'login'): void;
+  (e: 'logout'): void;
+  (e: 'toggle-mobile-menu'): void;
+}>();
+
+function getAvatarUrl(email?: string) {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(email || 'User')}&background=0f172a&color=fff&bold=true`;
+}
+
+watch(
+  () => props.mobileMenuOpen,
+  (isOpen) => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  },
+);
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
+</script>
+
 <template>
   <header
     class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 supports-backdrop-filter:bg-white/60 transition-all duration-300"
@@ -12,10 +53,10 @@
             <Pill :size="18" />
           </div>
           <div>
-            <h1 class="font-bold text-slate-900 tracking-tight leading-none text-lg">DrugList</h1>
-            <span class="text-[10px] text-slate-500 font-medium tracking-wider uppercase"
-              >Sabot Hospital</span
-            >
+            <h1 class="font-bold text-slate-900 tracking-tight leading-none text-lg">
+              DrugList
+            </h1>
+            <span class="text-[10px] text-slate-500 font-medium tracking-wider uppercase">Sabot Hospital</span>
           </div>
         </router-link>
       </div>
@@ -25,8 +66,7 @@
         <nav class="flex items-center gap-1 bg-slate-100/50 p-1 rounded-xl">
           <router-link v-slot="{ navigate, isActive }" to="/" custom>
             <button
-              :class="[
-                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2" :class="[
                 isActive
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700',
@@ -39,8 +79,7 @@
           </router-link>
           <router-link v-slot="{ navigate, isActive }" to="/decommissioned" custom>
             <button
-              :class="[
-                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2" :class="[
                 isActive
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700',
@@ -53,7 +92,7 @@
           </router-link>
         </nav>
 
-        <div class="h-6 w-px bg-slate-200"></div>
+        <div class="h-6 w-px bg-slate-200" />
 
         <!-- User Profile / Login -->
         <div v-if="user" class="flex items-center gap-3">
@@ -71,7 +110,7 @@
             class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm cursor-pointer hover:ring-blue-100 transition-all"
             title="คลิกเพื่อออกจากระบบ"
             @click="$emit('logout')"
-          />
+          >
         </div>
         <button
           v-else
@@ -127,12 +166,14 @@
               <img
                 :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)"
                 class="w-10 h-10 rounded-full"
-              />
+              >
               <div>
                 <div class="font-semibold text-slate-900">
                   {{ user.user_metadata?.full_name || user.email }}
                 </div>
-                <div class="text-xs text-slate-500">{{ isAdmin ? 'Administrator' : 'Viewer' }}</div>
+                <div class="text-xs text-slate-500">
+                  {{ isAdmin ? 'Administrator' : 'Viewer' }}
+                </div>
               </div>
             </div>
             <button
@@ -158,40 +199,3 @@
     </div>
   </header>
 </template>
-
-<script setup>
-  import { watch, onUnmounted } from 'vue';
-  import { Pill, ArchiveRestore, Menu, X, FileSpreadsheet } from 'lucide-vue-next';
-
-  const props = defineProps({
-    user: {
-      type: Object,
-      default: null,
-    },
-    mobileMenuOpen: {
-      type: Boolean,
-      default: false,
-    },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
-  });
-
-  defineEmits(['login', 'logout', 'toggle-mobile-menu']);
-
-  const getAvatarUrl = (email) => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=0f172a&color=fff&bold=true`;
-  };
-
-  watch(
-    () => props.mobileMenuOpen,
-    (isOpen) => {
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    },
-  );
-
-  onUnmounted(() => {
-    document.body.style.overflow = '';
-  });
-</script>

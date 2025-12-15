@@ -1,44 +1,46 @@
-<script setup>
-  import { ref, onMounted } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useAuthStore } from './stores/auth';
-  import { useToastStore } from './stores/toast';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { onMounted, ref } from 'vue';
 
-  // Components
-  import Navbar from './components/Navbar.vue';
-  import Toast from './components/Toast.vue';
-  import LoginModal from './components/LoginModal.vue';
+import LoginModal from '@/components/LoginModal.vue';
+// Components
+import Navbar from '@/components/Navbar.vue';
+import Toast from '@/components/Toast.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
 
-  // -- Stores --
-  const authStore = useAuthStore();
-  const toastStore = useToastStore();
-  const { user, isAdmin } = storeToRefs(authStore);
-  const { toasts } = storeToRefs(toastStore);
+// -- Stores --
+const authStore = useAuthStore();
+const toastStore = useToastStore();
+const { user, isAdmin } = storeToRefs(authStore);
+const { toasts } = storeToRefs(toastStore);
 
-  // -- UI State --
-  const showLoginModal = ref(false);
-  const mobileMenuOpen = ref(false);
+// -- UI State --
+const showLoginModal = ref(false);
+const mobileMenuOpen = ref(false);
 
-  // Initialize Auth
-  onMounted(() => {
-    authStore.initializeAuth();
-  });
+// Initialize Auth
+onMounted(() => {
+  authStore.initializeAuth();
+});
 
-  // -- Global Layout Handlers --
-  async function onLogoutClick() {
-    try {
-      await authStore.logout();
-      toastStore.addToast('ออกจากระบบแล้ว', 'info');
-    } catch (error) {
-      toastStore.addToast(`Logout Error: ${error.message}`, 'error');
-    }
+// -- Global Layout Handlers --
+async function onLogoutClick() {
+  try {
+    await authStore.logout();
+    toastStore.addToast('ออกจากระบบแล้ว', 'info');
   }
-
-  function toggleMobileMenu() {
-    mobileMenuOpen.value = !mobileMenuOpen.value;
+  catch (error: any) {
+    toastStore.addToast(`Logout Error: ${error.message}`, 'error');
   }
+}
+
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+}
 </script>
 
+<!-- Template remains the same -->
 <template>
   <div class="min-h-screen flex flex-col bg-[#FDFDFD] font-sans text-slate-900">
     <Navbar
@@ -76,18 +78,18 @@
 
 <style>
   /* Global Animation for Toasts */
-  .toast-slide-enter-active,
-  .toast-slide-leave-active {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+.toast-slide-enter-active,
+.toast-slide-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  .toast-slide-enter-from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
+.toast-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
 
-  .toast-slide-leave-to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
+.toast-slide-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
 </style>
