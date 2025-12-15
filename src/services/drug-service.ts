@@ -1,6 +1,6 @@
 import type { Drug, DrugInsert } from '@/types/database.types';
 
-import { supabase } from '@/supabaseClient';
+import { supabase } from '@/supabase-client';
 
 type GetDrugsParams = {
   page?: number;

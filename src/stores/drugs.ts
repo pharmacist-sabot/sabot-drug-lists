@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import { computed, reactive, ref, watch } from 'vue';
 
-import { drugService } from '../services/drugService';
+import { drugService } from '../services/drug-service';
 
 export const useDrugStore = defineStore('drugs', () => {
   // --- State ---

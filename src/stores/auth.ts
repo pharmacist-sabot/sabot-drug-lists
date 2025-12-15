@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import { supabase } from '@/supabaseClient';
+import { supabase } from '@/supabase-client';
 
 // ต้องมี export const ตรงนี้
 export const useAuthStore = defineStore('auth', () => {
