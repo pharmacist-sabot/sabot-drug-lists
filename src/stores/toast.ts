@@ -1,10 +1,18 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-export const useToastStore = defineStore('toast', () => {
-  const toasts = ref([]);
+export type ToastType = 'success' | 'error' | 'info';
 
-  function addToast(message, type = 'info') {
+export type ToastItem = {
+  id: number;
+  message: string;
+  type: ToastType;
+};
+
+export const useToastStore = defineStore('toast', () => {
+  const toasts = ref<ToastItem[]>([]);
+
+  function addToast(message: string, type: ToastType = 'info') {
     const id = Date.now();
     toasts.value.push({ id, message, type });
     setTimeout(() => {
@@ -12,7 +20,7 @@ export const useToastStore = defineStore('toast', () => {
     }, 3000);
   }
 
-  function removeToast(id) {
+  function removeToast(id: number) {
     toasts.value = toasts.value.filter(t => t.id !== id);
   }
 

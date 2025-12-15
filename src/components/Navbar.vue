@@ -20,7 +20,7 @@ const props = withDefaults(
 defineEmits<{
   (e: 'login'): void;
   (e: 'logout'): void;
-  (e: 'toggle-mobile-menu'): void;
+  (e: 'toggleMobileMenu'): void;
 }>();
 
 function getAvatarUrl(email?: string) {
@@ -124,7 +124,7 @@ onUnmounted(() => {
       <!-- Mobile Menu Toggle -->
       <button
         class="md:hidden text-slate-500 hover:text-slate-900 p-2"
-        @click="$emit('toggle-mobile-menu')"
+        @click="$emit('toggleMobileMenu')"
       >
         <Menu v-if="!mobileMenuOpen" />
         <X v-else />
@@ -137,7 +137,7 @@ onUnmounted(() => {
       class="md:hidden border-t border-slate-100 bg-white absolute w-full left-0 shadow-xl"
     >
       <div class="px-4 py-4 space-y-2">
-        <router-link to="/" class="block" @click="$emit('toggle-mobile-menu')">
+        <router-link to="/" class="block" @click="$emit('toggleMobileMenu')">
           <div
             class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-slate-50 transition-colors"
             :class="
@@ -147,7 +147,7 @@ onUnmounted(() => {
             <FileSpreadsheet :size="18" /> บัญชียา
           </div>
         </router-link>
-        <router-link to="/decommissioned" class="block" @click="$emit('toggle-mobile-menu')">
+        <router-link to="/decommissioned" class="block" @click="$emit('toggleMobileMenu')">
           <div
             class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-slate-50 transition-colors"
             :class="
@@ -188,7 +188,7 @@ onUnmounted(() => {
               class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-medium shadow-lg shadow-slate-900/20"
               @click="
                 $emit('login');
-                $emit('toggle-mobile-menu');
+                $emit('toggleMobileMenu');
               "
             >
               เข้าสู่ระบบ

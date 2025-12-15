@@ -42,11 +42,11 @@ withDefaults(
 
 defineEmits<{
   (e: 'edit', drug: Drug): void;
-  (e: 'trigger-decommission', drug: Drug): void;
+  (e: 'triggerDecommission', drug: Drug): void;
   (e: 'recommission', drug: Drug): void;
   (e: 'update:searchTerm', value: string): void;
   (e: 'update:filterCategory', value: string): void;
-  (e: 'change-page', page: number): void;
+  (e: 'changePage', page: number): void;
 }>();
 
 function formatDate(dateString: string | null) {
@@ -193,7 +193,7 @@ function formatDate(dateString: string | null) {
                 <button
                   class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   title="นำออกจากบัญชี"
-                  @click="$emit('trigger-decommission', drug)"
+                  @click="$emit('triggerDecommission', drug)"
                 >
                   <Archive :size="18" />
                 </button>
@@ -223,14 +223,14 @@ function formatDate(dateString: string | null) {
         <button
           :disabled="currentPage === 1"
           class="p-2 border border-slate-200 rounded-lg hover:bg-white bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          @click="$emit('change-page', currentPage - 1)"
+          @click="$emit('changePage', currentPage - 1)"
         >
           <ChevronLeft :size="16" />
         </button>
         <button
           :disabled="currentPage >= totalPages"
           class="p-2 border border-slate-200 rounded-lg hover:bg-white bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          @click="$emit('change-page', currentPage + 1)"
+          @click="$emit('changePage', currentPage + 1)"
         >
           <ChevronRight :size="16" />
         </button>

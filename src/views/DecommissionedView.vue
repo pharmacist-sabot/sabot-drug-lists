@@ -34,8 +34,12 @@ watch(
 );
 
 async function handleRecommission(drug: Drug) {
-  if (!confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`))
+  // eslint-disable-next-line no-alert
+  const isConfirmed = window.confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`);
+
+  if (!isConfirmed)
     return;
+
   const result = await drugStore.recommissionDrug(drug);
   if (result.success) {
     toastStore.addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, 'success');

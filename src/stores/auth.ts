@@ -5,7 +5,6 @@ import { ref } from 'vue';
 
 import { supabase } from '@/supabase-client';
 
-// ต้องมี export const ตรงนี้
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
   const isAdmin = ref<boolean>(false);
@@ -21,11 +20,12 @@ export const useAuthStore = defineStore('auth', () => {
         .from('profiles_drugcupsabot')
         .select('role')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error)
         throw error;
-      isAdmin.value = data?.role === 'admin';
+
+      isAdmin.value = (data as any)?.role === 'admin';
     }
     catch (error) {
       console.error('Error fetching admin role:', error);

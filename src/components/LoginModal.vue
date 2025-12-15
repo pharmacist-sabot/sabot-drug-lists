@@ -25,7 +25,7 @@ async function handleSubmit() {
     toastStore.addToast('เข้าสู่ระบบสำเร็จ', 'success');
     emit('close');
   }
-  catch (err) {
+  catch (err: any) { // ✅ ใส่ : any ตรงนี้
     errorMsg.value = err.message || 'Email หรือรหัสผ่านไม่ถูกต้อง';
   }
   finally {

@@ -1,8 +1,10 @@
-import type { Drug, DrugInsert } from '@/types/database.types';
+import type { Drug, DrugInsert, DrugUpdate } from '@/types/database.types';
 
 import { supabase } from '@/supabase-client';
 
-type GetDrugsParams = {
+// --- Interfaces ---
+
+export type GetDrugsParams = {
   page?: number;
   pageSize?: number;
   status?: 'active' | 'decommissioned';
@@ -10,12 +12,17 @@ type GetDrugsParams = {
   searchTerm?: string;
 };
 
-type GetDrugsResponse = {
+export type GetDrugsResponse = {
   data: Drug[];
   count: number;
 };
 
+// --- Service ---
+
 export const drugService = {
+  /**
+   * ดึงข้อมูลรายการยาแบบ Pagination และ Filtering
+   */
   async getDrugs({
     page = 1,
     pageSize = 20,
@@ -45,7 +52,6 @@ export const drugService = {
 
       if (searchTerm) {
         const term = `%${searchTerm.trim()}%`;
-        // Supabase Postgrest Filters typing needs raw string for dynamic OR
         query = query.or(
           `trade_name.ilike.${term},generic_name.ilike.${term},drug_code.ilike.${term},remarks.ilike.${term}`,
         );
@@ -55,10 +61,14 @@ export const drugService = {
 
       const { data, count, error } = await query;
 
-      if (error)
-        throw error;
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      return { data: data || [], count: count || 0 };
+      return {
+        data: data || [],
+        count: count || 0,
+      };
     }
     catch (error) {
       console.error('DrugService Error [getDrugs]:', error);
@@ -66,18 +76,24 @@ export const drugService = {
     }
   },
 
+  /**
+   * ดึงหมวดหมู่ยาที่ไม่ซ้ำกัน
+   */
   async getCategories(): Promise<string[]> {
     try {
-      // RPC call needs generic type argument if RPC is complex, or standard return inference
-      const { data, error } = await supabase.rpc('get_unique_categories', {
+      const { data, error } = await (supabase.rpc as any)('get_unique_categories', {
         status_filter: 'active',
       });
 
-      if (error)
-        throw error;
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      // Assumes RPC returns { category: string }[]
-      return (data as any[]).map(item => item.category);
+      if (Array.isArray(data)) {
+        return data.map((item: any) => item.category);
+      }
+
+      return [];
     }
     catch (error) {
       console.error('DrugService Error [getCategories]:', error);
@@ -85,14 +101,20 @@ export const drugService = {
     }
   },
 
+  /**
+   * เพิ่ม หรือ แก้ไขข้อมูลยา
+   */
   async upsertDrugs(payload: DrugInsert | DrugInsert[]): Promise<boolean> {
     try {
-      const { error } = await supabase.from('drugs').upsert(payload, {
+      const payloadArray = Array.isArray(payload) ? payload : [payload];
+
+      const { error } = await supabase.from('drugs').upsert(payloadArray as any, {
         onConflict: 'drug_code',
       });
 
-      if (error)
-        throw error;
+      if (error) {
+        throw new Error(error.message);
+      }
       return true;
     }
     catch (error) {
@@ -101,21 +123,27 @@ export const drugService = {
     }
   },
 
+  /**
+   * เปลี่ยนสถานะยา (Decommission / Recommission)
+   */
   async updateStatus(
     id: string,
     { isActive, remarks = null }: { isActive: boolean; remarks?: string | null },
   ): Promise<boolean> {
     try {
-      const updatePayload = {
+      const updatePayload: DrugUpdate = {
         is_active: isActive,
-        remarks,
+        remarks: isActive ? null : remarks,
         decommissioned_at: isActive ? null : new Date().toISOString(),
       };
 
-      const { error } = await supabase.from('drugs').update(updatePayload).eq('id', id);
+      const { error } = await (supabase.from('drugs') as any)
+        .update(updatePayload)
+        .eq('id', id);
 
-      if (error)
-        throw error;
+      if (error) {
+        throw new Error(error.message);
+      }
       return true;
     }
     catch (error) {
