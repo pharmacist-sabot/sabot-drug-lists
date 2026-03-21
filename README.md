@@ -1,35 +1,35 @@
 # Sabot Drug Lists (Hospital Drug Formulary Management System)
 
-![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)
-![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Pinia](https://img.shields.io/badge/pinia-%23ffd859.svg?style=for-the-badge&logo=pinia&logoColor=black)
+[![Vue.js](https://img.shields.io/badge/Vue.js-35495E?logo=vuedotjs&logoColor=4FC08D)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Pinia](https://img.shields.io/badge/Pinia-FFD859?logo=pinia&logoColor=black)](https://pinia.vuejs.org/)
 
 A modern, comprehensive **Progressive Web Application (PWA)** for managing a hospital's drug formulary. Built with **Vue 3**, **Vite**, and **Supabase**, this system streamlines the process of viewing, searching, adding, editing, and decommissioning drugs from the hospital's official list.
 
-## ✨ Key Features
+## Key Features
 
-- **📱 Progressive Web App (PWA)**: Fully installable on desktop and mobile devices with offline capabilities and auto-updates.
-- **🔐 Role-Based Access Control**: Secure access with distinct roles for **Administrators** (full CRUD access) and **Viewers** (read-only).
-- **💊 Full Drug Lifecycle Management**:
+- **Progressive Web App (PWA)**: Fully installable on desktop and mobile devices with offline capabilities and auto-updates.
+- **Role-Based Access Control**: Secure access with distinct roles for **Administrators** (full CRUD access) and **Viewers** (read-only).
+- **Full Drug Lifecycle Management**:
   - **Create**: Add new drugs to the formulary.
   - **Read**: Advanced search and filtering capabilities.
   - **Update**: Edit existing drug details.
   - **Decommission**: Move drugs to a historical archive with required justification.
   - **Recommission**: Restore drugs to the active list.
-- **⚡ High Performance**:
+- **High Performance**:
   - **State Management**: Powered by [Pinia](https://pinia.vuejs.org/) for efficient and reactive data handling.
   - **Server-Side Pagination**: Optimized for handling large datasets without performance degradation.
   - **Instant Search**: Real-time filtering by drug code, trade name, generic name, or category.
-- **🛠️ Powerful Admin Tools**:
+- **Powerful Admin Tools**:
   - **Bulk CSV Import**: Rapidly populate or update the database using CSV files.
-- **🎨 Modern UI/UX**:
+- **Modern UI/UX**:
   - **Responsive Design**: Built with [Tailwind CSS](https://tailwindcss.com/) for a mobile-first experience.
   - **Clean Iconography**: Using [Lucide Vue](https://lucide.dev/) for consistent and beautiful icons.
   - **Interactive Feedback**: Real-time toast notifications for user actions.
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Frontend Framework**: [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`)
 - **Build Tool**: [Vite](https://vitejs.dev/)
@@ -40,7 +40,7 @@ A modern, comprehensive **Progressive Web Application (PWA)** for managing a hos
 - **Icons**: [Lucide Vue](https://lucide.dev/)
 - **CSV Parsing**: [PapaParse](https://www.papaparse.com/)
 
-## 🔌 Supabase Backend Setup
+## Supabase Backend Setup
 
 This project requires a Supabase project for its backend. Ensure your project has the following schema:
 
@@ -62,7 +62,7 @@ This project requires a Supabase project for its backend. Ensure your project ha
 
 3.  **Authentication**: Enable Email/Password authentication.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -114,7 +114,7 @@ npm run build
 
 The artifacts will be in the `dist/` directory.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -129,7 +129,7 @@ src/
 └── supabaseClient.js # Supabase client configuration
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
