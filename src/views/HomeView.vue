@@ -1,95 +1,99 @@
-<script setup>
-  import { ref, onMounted, watch } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { Upload, Plus, LayoutDashboard } from 'lucide-vue-next';
-  import { useDrugStore } from '../stores/drugs';
-  import { useAuthStore } from '../stores/auth';
-  import { useToastStore } from '../stores/toast';
+<script setup lang="ts">
+import type { Drug, DrugFormData } from '../types';
+import { LayoutDashboard, Plus, Upload } from 'lucide-vue-next';
+import { storeToRefs } from 'pinia';
 
-  import DrugTable from '../components/DrugTable.vue';
-  import CsvUploadModal from '../components/CsvUploadModal.vue';
-  import DrugFormModal from '../components/DrugFormModal.vue';
-  import DecommissionModal from '../components/DecommissionModal.vue';
+import { onMounted, ref, watch } from 'vue';
+import CsvUploadModal from '../components/CsvUploadModal.vue';
+import DecommissionModal from '../components/DecommissionModal.vue';
+import DrugFormModal from '../components/DrugFormModal.vue';
+import DrugTable from '../components/DrugTable.vue';
+import { useAuthStore } from '../stores/auth';
+import { useDrugStore } from '../stores/drugs';
+import { useToastStore } from '../stores/toast';
 
-  const drugStore = useDrugStore();
-  const authStore = useAuthStore();
-  const toastStore = useToastStore();
+const drugStore = useDrugStore();
+const authStore = useAuthStore();
+const toastStore = useToastStore();
 
-  const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
-  const { isAdmin } = storeToRefs(authStore);
+const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
+const { isAdmin } = storeToRefs(authStore);
 
-  const showCsvModal = ref(false);
-  const showDrugFormModal = ref(false);
-  const showDecommissionModal = ref(false);
-  const currentDrug = ref(null);
-  const allCategories = ref([]);
-  let searchTimeout;
+const showCsvModal = ref<boolean>(false);
+const showDrugFormModal = ref<boolean>(false);
+const showDecommissionModal = ref<boolean>(false);
+const currentDrug = ref<Drug | null>(null);
+const allCategories = ref<string[]>([]);
 
-  onMounted(async () => {
-    drugStore.resetFilters();
-    allCategories.value = await drugStore.fetchCategories();
-    await drugStore.fetchDrugs('active');
-  });
+let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  watch(
-    () => filters.value.searchTerm,
-    () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        drugStore.fetchDrugs('active');
-      }, 300);
-    },
-  );
+onMounted(async () => {
+  drugStore.resetFilters();
+  allCategories.value = await drugStore.fetchCategories();
+  await drugStore.fetchDrugs('active');
+});
 
-  watch(
-    () => filters.value.category,
-    () => {
+watch(
+  () => filters.value.searchTerm,
+  () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
       drugStore.fetchDrugs('active');
-    },
-  );
+    }, 300);
+  },
+);
 
-  function openAddDrugModal() {
-    currentDrug.value = null;
-    showDrugFormModal.value = true;
-  }
+watch(
+  () => filters.value.category,
+  () => {
+    drugStore.fetchDrugs('active');
+  },
+);
 
-  function openEditDrugModal(drug) {
-    currentDrug.value = { ...drug };
-    showDrugFormModal.value = true;
-  }
+function openAddDrugModal(): void {
+  currentDrug.value = null;
+  showDrugFormModal.value = true;
+}
 
-  function openDecommissionModal(drug) {
-    currentDrug.value = drug;
-    showDecommissionModal.value = true;
-  }
+function openEditDrugModal(drug: Drug): void {
+  currentDrug.value = { ...drug };
+  showDrugFormModal.value = true;
+}
 
-  async function handleSaveDrug(drugData) {
-    const result = await drugStore.saveDrug(drugData);
-    if (result.success) {
-      showDrugFormModal.value = false;
-      toastStore.addToast('บันทึกข้อมูลยาสำเร็จ', 'success');
-      await drugStore.fetchDrugs('active');
-      allCategories.value = await drugStore.fetchCategories();
-    } else {
-      toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
-    }
-  }
+function openDecommissionModal(drug: Drug): void {
+  currentDrug.value = drug;
+  showDecommissionModal.value = true;
+}
 
-  async function handleDecommission({ drug, remarks }) {
-    const result = await drugStore.decommissionDrug(drug, remarks);
-    if (result.success) {
-      showDecommissionModal.value = false;
-      toastStore.addToast(`นำยา "${drug.trade_name}" ออกจากบัญชีสำเร็จ`, 'success');
-      await drugStore.fetchDrugs('active');
-    } else {
-      toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
-    }
-  }
-
-  async function onCsvSuccess() {
+async function handleSaveDrug(drugData: DrugFormData): Promise<void> {
+  const result = await drugStore.saveDrug(drugData);
+  if (result.success) {
+    showDrugFormModal.value = false;
+    toastStore.addToast('บันทึกข้อมูลยาสำเร็จ', 'success');
     await drugStore.fetchDrugs('active');
     allCategories.value = await drugStore.fetchCategories();
   }
+  else {
+    toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
+  }
+}
+
+async function handleDecommission({ drug, remarks }: { drug: Drug; remarks: string }): Promise<void> {
+  const result = await drugStore.decommissionDrug(drug, remarks);
+  if (result.success) {
+    showDecommissionModal.value = false;
+    toastStore.addToast(`นำยา "${drug.trade_name}" ออกจากบัญชีสำเร็จ`, 'success');
+    await drugStore.fetchDrugs('active');
+  }
+  else {
+    toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
+  }
+}
+
+async function onCsvSuccess(): Promise<void> {
+  await drugStore.fetchDrugs('active');
+  allCategories.value = await drugStore.fetchCategories();
+}
 </script>
 
 <template>
@@ -103,8 +107,12 @@
           <LayoutDashboard :size="24" />
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">รายการยาปัจจุบัน</h2>
-          <p class="text-slate-500 text-sm mt-1">จัดการข้อมูลยา ราคายา และสถานะการใช้งาน</p>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
+            รายการยาปัจจุบัน
+          </h2>
+          <p class="text-slate-500 text-sm mt-1">
+            จัดการข้อมูลยา ราคายา และสถานะการใช้งาน
+          </p>
         </div>
       </div>
 
@@ -128,39 +136,21 @@
 
     <!-- Table -->
     <DrugTable
-      v-model:search-term="filters.searchTerm"
-      v-model:filter-category="filters.category"
-      :drugs="drugs"
-      :loading="loading"
-      :is-admin="isAdmin"
-      :is-decommissioned-view="false"
-      :available-categories="allCategories"
-      :current-page="currentPage"
-      :total-pages="totalPages"
-      :total-count="totalCount"
-      @edit="openEditDrugModal"
-      @trigger-decommission="openDecommissionModal"
-      @change-page="(p) => drugStore.changePage(p, 'active')"
+      v-model:search-term="filters.searchTerm" v-model:filter-category="filters.category" :drugs="drugs"
+      :loading="loading" :is-admin="isAdmin" :is-decommissioned-view="false" :available-categories="allCategories"
+      :current-page="currentPage" :total-pages="totalPages" :total-count="totalCount" @edit="openEditDrugModal"
+      @trigger-decommission="openDecommissionModal" @change-page="(p) => drugStore.changePage(p, 'active')"
     />
 
     <!-- Modals -->
-    <CsvUploadModal
-      :show="showCsvModal"
-      @close="showCsvModal = false"
-      @import-success="onCsvSuccess"
-    />
+    <CsvUploadModal :show="showCsvModal" @close="showCsvModal = false" @import-success="onCsvSuccess" />
     <DrugFormModal
-      :show="showDrugFormModal"
-      :drug="currentDrug"
-      @close="showDrugFormModal = false"
+      :show="showDrugFormModal" :drug="currentDrug" @close="showDrugFormModal = false"
       @save="handleSaveDrug"
     />
     <DecommissionModal
-      v-if="currentDrug"
-      :show="showDecommissionModal"
-      :drug="currentDrug"
-      @close="showDecommissionModal = false"
-      @confirm="handleDecommission"
+      v-if="currentDrug" :show="showDecommissionModal" :drug="currentDrug"
+      @close="showDecommissionModal = false" @confirm="handleDecommission"
     />
   </div>
 </template>

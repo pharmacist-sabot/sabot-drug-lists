@@ -1,15 +1,14 @@
-// vite.config.js
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { VitePWA } from 'vite-plugin-pwa';
 import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate', // อัปเดตเนื้อหาใหม่อัตโนมัติเมื่อมีการ deploy
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'บัญชียาโรงพยาบาลสระโบสถ์',

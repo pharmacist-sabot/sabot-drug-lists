@@ -1,45 +1,49 @@
-<script setup>
-  import { onMounted, watch } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useDrugStore } from '../stores/drugs';
-  import { useAuthStore } from '../stores/auth';
-  import { useToastStore } from '../stores/toast';
-  import DrugTable from '../components/DrugTable.vue';
-  import { History } from 'lucide-vue-next';
+<script setup lang="ts">
+import type { Drug } from '../types';
+import { History } from 'lucide-vue-next';
+import { storeToRefs } from 'pinia';
 
-  const drugStore = useDrugStore();
-  const authStore = useAuthStore();
-  const toastStore = useToastStore();
-  const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
-  const { isAdmin } = storeToRefs(authStore);
+import { onMounted, watch } from 'vue';
+import DrugTable from '../components/DrugTable.vue';
+import { useAuthStore } from '../stores/auth';
+import { useDrugStore } from '../stores/drugs';
+import { useToastStore } from '../stores/toast';
 
-  let searchTimeout;
+const drugStore = useDrugStore();
+const authStore = useAuthStore();
+const toastStore = useToastStore();
+const { drugs, loading, filters, currentPage, totalPages, totalCount } = storeToRefs(drugStore);
+const { isAdmin } = storeToRefs(authStore);
 
-  onMounted(() => {
-    drugStore.resetFilters();
-    drugStore.fetchDrugs('decommissioned');
-  });
+let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  watch(
-    () => filters.value.searchTerm,
-    () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        drugStore.fetchDrugs('decommissioned');
-      }, 300);
-    },
-  );
+onMounted(() => {
+  drugStore.resetFilters();
+  drugStore.fetchDrugs('decommissioned');
+});
 
-  async function handleRecommission(drug) {
-    if (!confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`)) return;
-    const result = await drugStore.recommissionDrug(drug);
-    if (result.success) {
-      toastStore.addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, 'success');
+watch(
+  () => filters.value.searchTerm,
+  () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
       drugStore.fetchDrugs('decommissioned');
-    } else {
-      toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
-    }
+    }, 300);
+  },
+);
+
+async function handleRecommission(drug: Drug): Promise<void> {
+  if (!confirm(`คุณต้องการนำยา "${drug.trade_name}" กลับเข้าสู่บัญชีใช่หรือไม่?`))
+    return;
+  const result = await drugStore.recommissionDrug(drug);
+  if (result.success) {
+    toastStore.addToast(`นำยา "${drug.trade_name}" กลับเข้าสู่บัญชีเรียบร้อยแล้ว`, 'success');
+    drugStore.fetchDrugs('decommissioned');
   }
+  else {
+    toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
+  }
+}
 </script>
 
 <template>
@@ -53,24 +57,21 @@
           <History :size="24" />
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">ประวัติการยกเลิกยา</h2>
-          <p class="text-slate-500 text-sm mt-1">รายการยาที่ถูกนำออกจากบัญชี</p>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
+            ประวัติการยกเลิกยา
+          </h2>
+          <p class="text-slate-500 text-sm mt-1">
+            รายการยาที่ถูกนำออกจากบัญชี
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Table -->
     <DrugTable
-      v-model:search-term="filters.searchTerm"
-      :drugs="drugs"
-      :loading="loading"
-      :is-admin="isAdmin"
-      :is-decommissioned-view="true"
-      :current-page="currentPage"
-      :total-pages="totalPages"
-      :total-count="totalCount"
-      @recommission="handleRecommission"
-      @change-page="(p) => drugStore.changePage(p, 'decommissioned')"
+      v-model:search-term="filters.searchTerm" :drugs="drugs" :loading="loading" :is-admin="isAdmin"
+      :is-decommissioned-view="true" :current-page="currentPage" :total-pages="totalPages" :total-count="totalCount"
+      @recommission="handleRecommission" @change-page="(p) => drugStore.changePage(p, 'decommissioned')"
     />
   </div>
 </template>

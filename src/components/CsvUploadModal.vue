@@ -1,88 +1,103 @@
-<script setup>
-  import { ref } from 'vue';
-  import Papa from 'papaparse';
-  import { useDrugStore } from '../stores/drugs';
-  import { useToastStore } from '../stores/toast';
+<script setup lang="ts">
+import type { CsvRow, DrugFormData } from '../types';
+import { FileSpreadsheet, UploadCloud, X } from 'lucide-vue-next';
+import Papa from 'papaparse';
 
-  import { X, FileSpreadsheet, UploadCloud } from 'lucide-vue-next';
+import { ref } from 'vue';
+import { useDrugStore } from '../stores/drugs';
+import { useToastStore } from '../stores/toast';
 
-  defineProps({ show: Boolean });
-  const emit = defineEmits(['close', 'import-success']);
+defineProps<{
+  show: boolean;
+}>();
 
-  const file = ref(null);
-  const isLoading = ref(false);
-  const toastStore = useToastStore();
-  const drugStore = useDrugStore();
+const emit = defineEmits<{
+  'close': [];
+  'import-success': [];
+}>();
 
-  function handleFileChange(event) {
-    file.value = event.target.files[0];
+const file = ref<File | null>(null);
+const isLoading = ref<boolean>(false);
+const toastStore = useToastStore();
+const drugStore = useDrugStore();
+
+function handleFileChange(event: Event): void {
+  // FIX: Cast event.target to HTMLInputElement for TypeScript correctness.
+  // Runtime guarantee: this handler is only bound to a file <input> element.
+  const target = event.target as HTMLInputElement;
+  file.value = target.files?.[0] ?? null;
+}
+
+function processImport(): void {
+  if (!file.value) {
+    toastStore.addToast('กรุณาเลือกไฟล์ CSV', 'error');
+    return;
   }
 
-  function processImport() {
-    if (!file.value) {
-      toastStore.addToast('กรุณาเลือกไฟล์ CSV', 'error');
-      return;
-    }
+  isLoading.value = true;
+  toastStore.addToast('กำลังประมวลผลไฟล์...', 'info');
 
-    isLoading.value = true;
-    toastStore.addToast('กำลังประมวลผลไฟล์...', 'info');
+  Papa.parse<CsvRow>(file.value, {
+    header: true,
+    skipEmptyLines: true,
+    complete: async (results) => {
+      // FIX: Map CSV rows to DrugFormData shape. drug_code uses `|| null` to treat
+      // empty strings as null, matching original JS behavior. The filter type predicate
+      // narrows drug_code from `string | null` to `string` for type safety.
+      type MappedRow = Omit<DrugFormData, 'id' | 'decommissioned_at'> & { drug_code: string | null };
 
-    Papa.parse(file.value, {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (results) => {
-        const drugsToInsert = results.data
-          .map((row) => ({
-            drug_code: row['รหัสเวชภัณฑ์'] || null,
-            trade_name: row['ชื่อเวชภัณฑ์'] || null,
-            generic_name: row['Generic name'] || null,
-            account: row['บัญชี'] || null,
-            price_opd: parseFloat(row['ราคา (OPD)']) || 0,
-            category: row['Category'] || null,
-            is_active: true,
-          }))
-          .filter((drug) => drug.drug_code);
+      const mapped: MappedRow[] = results.data.map(row => ({
+        drug_code: row['รหัสเวชภัณฑ์'] || null,
+        trade_name: row['ชื่อเวชภัณฑ์'] || null,
+        generic_name: row['Generic name'] || null,
+        account: row['บัญชี'] || null,
+        price_opd: Number.parseFloat(row['ราคา (OPD)'] ?? '') || 0,
+        category: row.Category || null,
+        is_active: true,
+      }));
 
-        if (drugsToInsert.length === 0) {
-          toastStore.addToast('ไม่พบข้อมูลที่ถูกต้องในไฟล์ CSV', 'error');
-          isLoading.value = false;
-          return;
-        }
+      const drugsToInsert: DrugFormData[] = mapped.filter(
+        (drug): drug is MappedRow & { drug_code: string } => Boolean(drug.drug_code),
+      );
 
-        const result = await drugStore.importDrugs(drugsToInsert);
-
+      if (drugsToInsert.length === 0) {
+        toastStore.addToast('ไม่พบข้อมูลที่ถูกต้องในไฟล์ CSV', 'error');
         isLoading.value = false;
-        if (!result.success) {
-          toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
-        } else {
-          toastStore.addToast(`นำเข้าข้อมูล ${drugsToInsert.length} รายการสำเร็จ!`, 'success');
-          emit('import-success');
-          setTimeout(() => emit('close'), 2000);
-        }
-      },
-      error: (err) => {
-        isLoading.value = false;
-        toastStore.addToast(`เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`, 'error');
-      },
-    });
-  }
+        return;
+      }
+
+      const result = await drugStore.importDrugs(drugsToInsert);
+
+      isLoading.value = false;
+      if (!result.success) {
+        toastStore.addToast(`เกิดข้อผิดพลาด: ${result.message}`, 'error');
+      }
+      else {
+        toastStore.addToast(`นำเข้าข้อมูล ${drugsToInsert.length} รายการสำเร็จ!`, 'success');
+        emit('import-success');
+        setTimeout(emit, 2000, 'close');
+      }
+    },
+    error: (err) => {
+      isLoading.value = false;
+      toastStore.addToast(`เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`, 'error');
+    },
+  });
+}
 </script>
 
 <template>
   <Transition name="modal">
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
-        @click="$emit('close')"
-      ></div>
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" @click="$emit('close')" />
 
       <div
         class="modal-panel relative bg-white w-full max-w-lg rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden transform border border-slate-100"
       >
-        <div
-          class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
-        >
-          <h3 class="font-semibold text-slate-900 text-lg">นำเข้าไฟล์ CSV</h3>
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <h3 class="font-semibold text-slate-900 text-lg">
+            นำเข้าไฟล์ CSV
+          </h3>
           <button
             class="p-2 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400 hover:text-slate-600"
             @click="$emit('close')"
@@ -103,13 +118,7 @@
             <label for="csv-file" class="cursor-pointer">
               <span class="block font-semibold text-slate-700">เลือกไฟล์ .csv</span>
               <span class="text-sm text-slate-400">คลิกเพื่อเลือกไฟล์จากเครื่องของคุณ</span>
-              <input
-                id="csv-file"
-                type="file"
-                accept=".csv"
-                class="hidden"
-                @change="handleFileChange"
-              />
+              <input id="csv-file" type="file" accept=".csv" class="hidden" @change="handleFileChange">
             </label>
             <div
               v-if="file"
@@ -119,10 +128,10 @@
             </div>
           </div>
 
-          <div
-            class="text-sm text-slate-500 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100"
-          >
-            <p class="font-semibold mb-2 text-slate-700">ข้อกำหนดไฟล์ CSV:</p>
+          <div class="text-sm text-slate-500 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <p class="font-semibold mb-2 text-slate-700">
+              ข้อกำหนดไฟล์ CSV:
+            </p>
             <p>
               ต้องมี Header: <code class="text-xs bg-white border px-1 rounded">รหัสเวชภัณฑ์</code>,
               <code class="text-xs bg-white border px-1 rounded">ชื่อเวชภัณฑ์</code>,
@@ -133,15 +142,13 @@
           <div class="flex justify-end gap-3">
             <button
               class="px-5 py-2.5 rounded-xl font-medium text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all"
-              :disabled="isLoading"
-              @click="$emit('close')"
+              :disabled="isLoading" @click="$emit('close')"
             >
               ยกเลิก
             </button>
             <button
               class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 flex items-center gap-2"
-              :disabled="isLoading"
-              @click="processImport"
+              :disabled="isLoading" @click="processImport"
             >
               <UploadCloud :size="16" />
               {{ isLoading ? 'กำลังประมวลผล...' : 'เริ่มนำเข้า' }}

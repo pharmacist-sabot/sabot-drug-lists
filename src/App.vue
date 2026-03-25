@@ -1,53 +1,54 @@
-<script setup>
-  import { ref, onMounted } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useAuthStore } from './stores/auth';
-  import { useToastStore } from './stores/toast';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { onMounted, ref } from 'vue';
 
-  // Components
-  import Navbar from './components/Navbar.vue';
-  import Toast from './components/Toast.vue';
-  import LoginModal from './components/LoginModal.vue';
+import LoginModal from './components/LoginModal.vue';
+import Navbar from './components/Navbar.vue';
+import Toast from './components/Toast.vue';
+import { useAuthStore } from './stores/auth';
+import { useToastStore } from './stores/toast';
 
-  // -- Stores --
-  const authStore = useAuthStore();
-  const toastStore = useToastStore();
-  const { user, isAdmin } = storeToRefs(authStore);
-  const { toasts } = storeToRefs(toastStore);
+// -- Stores --
+const authStore = useAuthStore();
+const toastStore = useToastStore();
+const { user, isAdmin } = storeToRefs(authStore);
+const { toasts } = storeToRefs(toastStore);
 
-  // -- UI State --
-  const showLoginModal = ref(false);
-  const mobileMenuOpen = ref(false);
+// -- UI State --
+const showLoginModal = ref<boolean>(false);
+const mobileMenuOpen = ref<boolean>(false);
 
-  // Initialize Auth
-  onMounted(() => {
-    authStore.initializeAuth();
-  });
+// Initialize Auth
+onMounted(() => {
+  authStore.initializeAuth();
+});
 
-  // -- Global Layout Handlers --
-  async function onLogoutClick() {
-    try {
-      await authStore.logout();
-      toastStore.addToast('ออกจากระบบแล้ว', 'info');
-    } catch (error) {
-      toastStore.addToast(`Logout Error: ${error.message}`, 'error');
-    }
+// -- Global Layout Handlers --
+async function onLogoutClick(): Promise<void> {
+  try {
+    await authStore.logout();
+    toastStore.addToast('ออกจากระบบแล้ว', 'info');
   }
-
-  function toggleMobileMenu() {
-    mobileMenuOpen.value = !mobileMenuOpen.value;
+  catch (error) {
+    // FIX: catch parameter is `unknown` in strict mode. Safely extract message.
+    // Runtime guarantee: Supabase auth errors always carry a message string.
+    toastStore.addToast(
+      `Logout Error: ${error instanceof Error ? error.message : String(error)}`,
+      'error',
+    );
   }
+}
+
+function toggleMobileMenu(): void {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+}
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-[#FDFDFD] font-sans text-slate-900">
     <Navbar
-      :user="user"
-      :is-admin="isAdmin"
-      :mobile-menu-open="mobileMenuOpen"
-      @login="showLoginModal = true"
-      @logout="onLogoutClick"
-      @toggle-mobile-menu="toggleMobileMenu"
+      :user="user" :is-admin="isAdmin" :mobile-menu-open="mobileMenuOpen" @login="showLoginModal = true"
+      @logout="onLogoutClick" @toggle-mobile-menu="toggleMobileMenu"
     />
 
     <main class="grow w-full">
@@ -55,15 +56,10 @@
     </main>
 
     <!-- Global Toast Container -->
-    <div
-      class="fixed bottom-6 right-6 z-9999 flex flex-col gap-3 max-w-sm w-full pointer-events-none p-4 sm:p-0"
-    >
+    <div class="fixed bottom-6 right-6 z-9999 flex flex-col gap-3 max-w-sm w-full pointer-events-none p-4 sm:p-0">
       <TransitionGroup name="toast-slide">
         <Toast
-          v-for="toast in toasts"
-          :key="toast.id"
-          :message="toast.message"
-          :type="toast.type"
+          v-for="toast in toasts" :key="toast.id" :message="toast.message" :type="toast.type"
           class="pointer-events-auto"
         />
       </TransitionGroup>
@@ -75,19 +71,19 @@
 </template>
 
 <style>
-  /* Global Animation for Toasts */
-  .toast-slide-enter-active,
-  .toast-slide-leave-active {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+/* Global Animation for Toasts */
+.toast-slide-enter-active,
+.toast-slide-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  .toast-slide-enter-from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
+.toast-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
 
-  .toast-slide-leave-to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
+.toast-slide-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
 </style>
