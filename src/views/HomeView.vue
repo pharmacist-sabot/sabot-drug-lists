@@ -2,12 +2,13 @@
 import type { Drug, DrugFormData } from '../types';
 import { LayoutDashboard, Plus, Upload } from 'lucide-vue-next';
 import { storeToRefs } from 'pinia';
-
 import { onMounted, ref, watch } from 'vue';
 import CsvUploadModal from '../components/CsvUploadModal.vue';
 import DecommissionModal from '../components/DecommissionModal.vue';
 import DrugFormModal from '../components/DrugFormModal.vue';
 import DrugTable from '../components/DrugTable.vue';
+import StatsOverview from '../components/StatsOverview.vue';
+
 import { useAuthStore } from '../stores/auth';
 import { useDrugStore } from '../stores/drugs';
 import { useToastStore } from '../stores/toast';
@@ -133,6 +134,9 @@ async function onCsvSuccess(): Promise<void> {
         </button>
       </div>
     </div>
+
+    <!-- Stats Overview -->
+    <StatsOverview />
 
     <!-- Table -->
     <DrugTable

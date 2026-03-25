@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { User } from '@supabase/supabase-js';
-import { ArchiveRestore, FileSpreadsheet, Menu, Pill, X } from 'lucide-vue-next';
+import { ArchiveRestore, ClipboardList, FileSpreadsheet, Menu, Pill, X } from 'lucide-vue-next';
 import { onUnmounted, watch } from 'vue';
 
 type Props = {
@@ -62,7 +62,8 @@ onUnmounted(() => {
         <nav class="flex items-center gap-1 bg-slate-100/50 p-1 rounded-xl">
           <router-link v-slot="{ navigate, isActive }" to="/" custom>
             <button
-              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2" :class="[
+              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+              :class="[
                 isActive
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700',
@@ -74,7 +75,8 @@ onUnmounted(() => {
           </router-link>
           <router-link v-slot="{ navigate, isActive }" to="/decommissioned" custom>
             <button
-              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2" :class="[
+              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+              :class="[
                 isActive
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700',
@@ -82,6 +84,19 @@ onUnmounted(() => {
             >
               <ArchiveRestore :size="16" />
               ประวัติการยกเลิก
+            </button>
+          </router-link>
+          <router-link v-slot="{ navigate, isActive }" to="/activity" custom>
+            <button
+              class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+              :class="[
+                isActive
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700',
+              ]" @click="navigate"
+            >
+              <ClipboardList :size="16" />
+              บันทึกการเปลี่ยนแปลง
             </button>
           </router-link>
         </nav>
@@ -141,6 +156,17 @@ onUnmounted(() => {
             "
           >
             <ArchiveRestore :size="18" /> ประวัติการยกเลิก
+          </div>
+        </router-link>
+        <router-link to="/activity" class="block" @click="$emit('toggle-mobile-menu')">
+          <div
+            class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-slate-50 transition-colors"
+            :class="$route.path === '/activity'
+              ? 'bg-blue-50 text-blue-600 font-semibold'
+              : 'text-slate-600'
+            "
+          >
+            <ClipboardList :size="18" /> บันทึกการเปลี่ยนแปลง
           </div>
         </router-link>
 

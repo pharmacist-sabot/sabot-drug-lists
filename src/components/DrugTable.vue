@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Drug } from '../types';
 
-import { Archive, ChevronLeft, ChevronRight, Loader2, Pill, RotateCcw, SearchX } from 'lucide-vue-next';
+import { Archive, ChevronLeft, ChevronRight, Loader2, Pill, RotateCcw, SearchX, Sparkles } from 'lucide-vue-next';
 import SearchBar from './SearchBar.vue';
 
 type Props = {
@@ -54,6 +54,18 @@ function formatDate(dateString: string | null | undefined): string {
     month: 'short',
     day: 'numeric',
   });
+}
+
+/**
+ * ตรวจสอบว่าเป็นยาที่เพิ่งเข้ามาใหม่ภายใน 30 วันหรือไม่
+ * ใช้ created_at จาก database (NULL = ยาเก่าก่อน migration)
+ */
+function isNewDrug(drug: Drug): boolean {
+  if (!drug.created_at)
+    return false;
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return new Date(drug.created_at) >= thirtyDaysAgo;
 }
 </script>
 
@@ -121,9 +133,20 @@ function formatDate(dateString: string | null | undefined): string {
             >
               <Pill :size="20" />
             </div>
-            <div>
+            <div class="min-w-0">
+              <!-- Drug name + badges row -->
               <div class="flex items-center flex-wrap gap-2 mb-1">
                 <span class="font-semibold text-slate-900 text-base">{{ drug.trade_name }}</span>
+
+                <!-- NEW badge: แสดงเฉพาะยาที่เพิ่งเข้ามาภายใน 30 วัน -->
+                <span
+                  v-if="isNewDrug(drug) && !isDecommissionedView"
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500 text-white shadow-sm shadow-emerald-500/30 animate-pulse-slow"
+                >
+                  <Sparkles :size="10" />
+                  ใหม่
+                </span>
+
                 <span
                   class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100"
                 >
@@ -136,6 +159,8 @@ function formatDate(dateString: string | null | undefined): string {
                   Decommissioned
                 </span>
               </div>
+
+              <!-- Drug meta row -->
               <div class="text-sm text-slate-500 flex flex-wrap gap-x-3 gap-y-1 items-center">
                 <span
                   class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 border border-slate-200"
@@ -146,7 +171,17 @@ function formatDate(dateString: string | null | undefined): string {
                 <span class="text-slate-300 hidden sm:inline">•</span>
                 <span>{{ drug.category }}</span>
               </div>
-              <!-- Remarks Display -->
+
+              <!-- Notes: แสดงหมายเหตุการเพิ่มยา (สำหรับยา active) -->
+              <div
+                v-if="!isDecommissionedView && drug.notes"
+                class="mt-2 text-xs text-slate-500 bg-amber-50/70 border border-amber-100 px-2.5 py-1.5 rounded-lg inline-flex items-start gap-1.5 max-w-sm"
+              >
+                <span class="shrink-0 mt-0.5">📝</span>
+                <span class="break-words">{{ drug.notes }}</span>
+              </div>
+
+              <!-- Remarks Display (สำหรับยาที่นำออก) -->
               <div
                 v-if="isDecommissionedView && drug.remarks"
                 class="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded-lg inline-block border border-red-100"

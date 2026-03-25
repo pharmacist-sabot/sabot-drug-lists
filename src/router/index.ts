@@ -15,6 +15,12 @@ const routes = [
     component: () => import('../views/DecommissionedView.vue'),
     meta: { title: 'ยาที่นำออกจากบัญชี' },
   },
+  {
+    path: '/activity',
+    name: 'Activity',
+    component: () => import('../views/ActivityView.vue'),
+    meta: { title: 'บันทึกการเปลี่ยนแปลง' },
+  },
 ];
 
 const router = createRouter({
