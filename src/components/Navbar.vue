@@ -113,8 +113,8 @@ onUnmounted(() => {
               {{ isAdmin ? 'Administrator' : 'Viewer' }}
             </div>
           </div>
-          <div class="relative group cursor-pointer" @click="$emit('logout')" title="คลิกเพื่อออกจากระบบ">
-            <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
+          <div class="relative group cursor-pointer" title="คลิกเพื่อออกจากระบบ" @click="$emit('logout')">
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity duration-300" />
             <img
               :src="user.user_metadata?.avatar_url || getAvatarUrl(user.email)" alt="User"
               class="relative w-11 h-11 rounded-full ring-2 ring-white ring-offset-2 ring-offset-slate-50 hover:ring-blue-400 shadow-md transition-all duration-300"
