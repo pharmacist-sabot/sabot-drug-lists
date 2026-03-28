@@ -168,8 +168,6 @@ function isNewDrug(drug: Drug): boolean {
                   {{ drug.drug_code }}
                 </span>
                 <span>{{ drug.generic_name }}</span>
-                <span class="text-slate-300 hidden sm:inline">•</span>
-                <span>{{ drug.category }}</span>
               </div>
 
               <!-- Notes: แสดงหมายเหตุการเพิ่มยา (สำหรับยา active) -->
