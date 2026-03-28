@@ -251,7 +251,7 @@ onMounted(() => {
     <div class="no-print flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div class="flex items-start gap-4">
         <div
-          class="w-12 h-12 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 shrink-0"
+          class="hidden md:flex w-12 h-12 bg-indigo-50 rounded-2xl items-center justify-center text-indigo-600 shadow-sm border border-indigo-100 shrink-0"
         >
           <ClipboardList :size="24" />
         </div>
