@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { User } from '@supabase/supabase-js';
-import { ArchiveRestore, ClipboardList, FileSpreadsheet, Menu, Pill, X } from 'lucide-vue-next';
+import { ArchiveRestore, ClipboardList, FileSpreadsheet, Menu, X } from 'lucide-vue-next';
 import { onUnmounted, watch } from 'vue';
 
 type Props = {
@@ -43,11 +43,11 @@ onUnmounted(() => {
       <!-- Brand -->
       <div class="flex items-center gap-3">
         <router-link to="/" class="flex items-center gap-3.5 group">
-          <div
-            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 group-hover:-translate-y-0.5 transition-all duration-300"
-          >
-            <Pill :size="20" />
-          </div>
+          <img
+            src="/pwa-192x192.png"
+            alt="DrugList Logo"
+            class="w-12 h-12 rounded-xl shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 group-hover:-translate-y-0.5 transition-all duration-300 object-contain bg-white"
+          />
           <div class="flex flex-col">
             <h1 class="font-extrabold text-slate-900 tracking-tight leading-none text-xl group-hover:text-blue-600 transition-colors">
               DrugList
