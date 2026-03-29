@@ -5,6 +5,8 @@
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Pinia](https://img.shields.io/badge/Pinia-FFD859?logo=pinia&logoColor=black)](https://pinia.vuejs.org/)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+[![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white)](https://eslint.org/)
 
 A modern, comprehensive **Progressive Web Application (PWA)** for managing a hospital's drug formulary. Built with **Vue 3**, **Vite**, and **Supabase**, this system streamlines the process of viewing, searching, adding, editing, and decommissioning drugs from the hospital's official list.
 
@@ -18,6 +20,8 @@ A modern, comprehensive **Progressive Web Application (PWA)** for managing a hos
   - **Update**: Edit existing drug details.
   - **Decommission**: Move drugs to a historical archive with required justification.
   - **Recommission**: Restore drugs to the active list.
+- **Activity Logging & Audit Trail**:
+  - Track changes, user actions, and system statistics with a dedicated activity dashboard.
 - **High Performance**:
   - **State Management**: Powered by [Pinia](https://pinia.vuejs.org/) for efficient and reactive data handling.
   - **Server-Side Pagination**: Optimized for handling large datasets without performance degradation.
@@ -39,12 +43,15 @@ A modern, comprehensive **Progressive Web Application (PWA)** for managing a hos
 - **PWA Support**: [Vite PWA Plugin](https://vite-pwa-org.netlify.app/)
 - **Icons**: [Lucide Vue](https://lucide.dev/)
 - **CSV Parsing**: [PapaParse](https://www.papaparse.com/)
+- **Linting**: [ESLint](https://eslint.org/) (Flat Config)
+- **CI/CD**: GitHub Actions
+- **Deployment**: [Vercel](https://vercel.com/) (Pre-configured SPA routing)
 
 ## Supabase Backend Setup
 
 This project requires a Supabase project for its backend. Ensure your project has the following schema:
 
-1.  **`drugs` Table**:
+1. **`drugs` Table**:
     - `id` (uuid, PK)
     - `drug_code` (text)
     - `trade_name` (text)
@@ -54,13 +61,22 @@ This project requires a Supabase project for its backend. Ensure your project ha
     - `category` (text)
     - `is_active` (boolean, default: `true`)
     - `remarks` (text)
+    - `notes` (text)
+    - `created_at` (timestamp)
     - `decommissioned_at` (timestamp)
 
-2.  **`profiles_drugcupsabot` Table**:
+2. **`drug_changelog` Table**:
+    - `id` (uuid, PK)
+    - `drug_id` (uuid, FK to `drugs.id`)
+    - `action` (text)
+    - `changed_by` (uuid, FK to `auth.users.id`)
+    - `changed_at` (timestamp)
+
+3. **`profiles_drugcupsabot` Table**:
     - `id` (uuid, FK to `auth.users.id`)
     - `role` (text: `'admin'` or `'viewer'`)
 
-3.  **Authentication**: Enable Email/Password authentication.
+4. **Authentication**: Enable Email/Password authentication.
 
 ## Getting Started
 
@@ -71,20 +87,20 @@ This project requires a Supabase project for its backend. Ensure your project ha
 
 ### Installation
 
-1.  **Clone the repository**
+1. **Clone the repository**
 
     ```bash
     git clone https://github.com/pharmacist-sabot/sabot-drug-lists.git
     cd sabot-drug-lists
     ```
 
-2.  **Install dependencies**
+2. **Install dependencies**
 
     ```bash
     npm install
     ```
 
-3.  **Configure Environment**
+3. **Configure Environment**
     Create a `.env` file in the root directory:
 
     ```bash
@@ -98,10 +114,12 @@ This project requires a Supabase project for its backend. Ensure your project ha
     VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
     ```
 
-4.  **Run Development Server**
+4. **Run Development Server**
+
     ```bash
     npm run dev
     ```
+
     The app will be available at `http://localhost:5173`.
 
 ### Building for Production
@@ -116,7 +134,7 @@ The artifacts will be in the `dist/` directory.
 
 ## Project Structure
 
-```
+```text
 src/
 ├── assets/          # Global styles (Tailwind) and static assets
 ├── components/      # Reusable Vue components (UI elements, Modals)
@@ -133,8 +151,8 @@ src/
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-1.  Fork the project
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
