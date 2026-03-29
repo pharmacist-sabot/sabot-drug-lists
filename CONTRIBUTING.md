@@ -30,7 +30,7 @@ We gladly accept pull requests! If you're ready to contribute code, please follo
    git checkout -b feature/your-feature-name
    ```
 
-   *Tip: Use descriptive branch names like `fix/login-bug` or `feat/export-csv`.*
+   _Tip: Use descriptive branch names like `fix/login-bug` or `feat/export-csv`._
 
 4. **Make your changes** and commit them with clear, descriptive messages.
 5. **Push your branch** to your fork on GitHub:

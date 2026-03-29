@@ -52,29 +52,29 @@ A modern, comprehensive **Progressive Web Application (PWA)** for managing a hos
 This project requires a Supabase project for its backend. Ensure your project has the following schema:
 
 1. **`drugs` Table**:
-    - `id` (uuid, PK)
-    - `drug_code` (text)
-    - `trade_name` (text)
-    - `generic_name` (text)
-    - `account` (text)
-    - `price_opd` (numeric)
-    - `category` (text)
-    - `is_active` (boolean, default: `true`)
-    - `remarks` (text)
-    - `notes` (text)
-    - `created_at` (timestamp)
-    - `decommissioned_at` (timestamp)
+   - `id` (uuid, PK)
+   - `drug_code` (text)
+   - `trade_name` (text)
+   - `generic_name` (text)
+   - `account` (text)
+   - `price_opd` (numeric)
+   - `category` (text)
+   - `is_active` (boolean, default: `true`)
+   - `remarks` (text)
+   - `notes` (text)
+   - `created_at` (timestamp)
+   - `decommissioned_at` (timestamp)
 
 2. **`drug_changelog` Table**:
-    - `id` (uuid, PK)
-    - `drug_id` (uuid, FK to `drugs.id`)
-    - `action` (text)
-    - `changed_by` (uuid, FK to `auth.users.id`)
-    - `changed_at` (timestamp)
+   - `id` (uuid, PK)
+   - `drug_id` (uuid, FK to `drugs.id`)
+   - `action` (text)
+   - `changed_by` (uuid, FK to `auth.users.id`)
+   - `changed_at` (timestamp)
 
 3. **`profiles_drugcupsabot` Table**:
-    - `id` (uuid, FK to `auth.users.id`)
-    - `role` (text: `'admin'` or `'viewer'`)
+   - `id` (uuid, FK to `auth.users.id`)
+   - `role` (text: `'admin'` or `'viewer'`)
 
 4. **Authentication**: Enable Email/Password authentication.
 
@@ -89,38 +89,38 @@ This project requires a Supabase project for its backend. Ensure your project ha
 
 1. **Clone the repository**
 
-    ```bash
-    git clone https://github.com/pharmacist-sabot/sabot-drug-lists.git
-    cd sabot-drug-lists
-    ```
+   ```bash
+   git clone https://github.com/pharmacist-sabot/sabot-drug-lists.git
+   cd sabot-drug-lists
+   ```
 
 2. **Install dependencies**
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 3. **Configure Environment**
-    Create a `.env` file in the root directory:
+   Create a `.env` file in the root directory:
 
-    ```bash
-    cp .env
-    ```
+   ```bash
+   cp .env
+   ```
 
-    Update the `.env` file with your Supabase credentials:
+   Update the `.env` file with your Supabase credentials:
 
-    ```env
-    VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
-    VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
-    ```
+   ```env
+   VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
+   VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+   ```
 
 4. **Run Development Server**
 
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
-    The app will be available at `http://localhost:5173`.
+   The app will be available at `http://localhost:5173`.
 
 ### Building for Production
 
