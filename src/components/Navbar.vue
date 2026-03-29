@@ -47,7 +47,7 @@ onUnmounted(() => {
             src="/pwa-192x192.png"
             alt="DrugList Logo"
             class="w-12 h-12 rounded-xl shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 group-hover:-translate-y-0.5 transition-all duration-300 object-contain bg-white"
-          />
+          >
           <div class="flex flex-col">
             <h1 class="font-extrabold text-slate-900 tracking-tight leading-none text-xl group-hover:text-blue-600 transition-colors">
               DrugList
