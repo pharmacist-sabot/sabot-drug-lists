@@ -90,7 +90,7 @@ This project requires a Supabase project for its backend. Ensure your project ha
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/pharmacist-sabot/sabot-drug-lists.git
+   git clone https://github.com/suradet-ps/sabot-drug-lists.git
    cd sabot-drug-lists
    ```
 
