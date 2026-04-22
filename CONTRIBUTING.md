@@ -20,7 +20,7 @@ We gladly accept pull requests! If you're ready to contribute code, please follo
 2. **Clone your fork** locally:
 
    ```bash
-   git clone https://github.com/pharmacist-sabot/sabot-drug-lists.git
+   git clone https://github.com/suradet-ps/sabot-drug-lists.git
    cd sabot-drug-lists
    ```
 
